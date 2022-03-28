@@ -300,7 +300,7 @@ class Client(View):
                 print("exist3")
                 return render(request, 'client.html',{'mother_tongue_error':'Only Characters are required'})
 
-        if request.POST.get("mother_tongue") != '':
+        if request.POST.get("phone") != '':
             if not re.fullmatch(phone_regex, request.POST.get("phone")):
                 print("exist")
                 return render(request, "client.html", {"phone_error": "Phone number is not valid"})
