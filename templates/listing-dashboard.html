@@ -11,8 +11,6 @@
 <script>
     var df = {{ labels| safe}}
     var df1 = {{ data| safe}}
-    console.log(df, 'df')
-    console.log(df1, 'df1')
     var config = {
         type: 'pie',
         data: {
@@ -33,10 +31,7 @@
 
     window.onload = function () {
         var ctx = document.getElementById('pie-chart').getContext('2d');
-        console.log(ctx, 'ctx')
-        // window.myPie = new Chart(ctx, config);
         var myNewChart = new Chart(ctx, config);
-        console.log(myNewChart, 'mynewchart')
 
         $("#container").click(
 

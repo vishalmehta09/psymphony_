@@ -210,11 +210,6 @@
                 <span class="left-side1">
                     <span class="created-left-side">
                         <input class="disccc" type="checkbox" id="discontinious" name="discontinious" value="False">
-                        <!-- {% if client.discontinious == 'True'%}
-                        <input type="radio" id="discontinious" name="discontinious" value="True" checked>
-                        {%else%}
-                        <input type="radio" id="discontinious" name="discontinious" value="False">
-                        {%endif%} -->
 
                     </span>
                     <label for="fname">Discontinued</label>
@@ -402,9 +397,6 @@
 
         var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
 
-
-
-
         if (reg.test(email) == false) {
             document.getElementById('email_error').innerHTML = "Invalid Email"
             return false
@@ -413,8 +405,6 @@
 
 
     }
-
-
 
 
     //  For Gender
@@ -437,7 +427,6 @@
     document.getElementById('ST').checked = true
     {% endif %}
 
-
     // For Theropy
 
     {% if "OT" in theropy_select %}
@@ -452,11 +441,8 @@
     document.getElementById('SEE').checked = true
     {% endif %}
 
-
-
     function maxs() {
         var test = document.getElementById("date")
-        console.log(test)
         var dtToday = new Date();
 
         var month = dtToday.getMonth() + 1;
@@ -469,13 +455,10 @@
             day = '0' + day.toString();
 
         var maxDate = year + '-' + month + '-' + day;
-        console.log(maxDate)
 
         document.getElementById("date")[0].setAttribute(maxDate);
 
     }
-
-
 
     $(function () {
         var dtToday = new Date();
@@ -490,18 +473,12 @@
             day = '0' + day.toString();
 
         var maxDate = year + '-' + month + '-' + day;
-        console.log(maxDate)
         $('#date').attr('max', maxDate);
-
-
 
     });
 
 
     function getVal() {
-
-
-
 
         var dtToday = new Date();
 
@@ -563,7 +540,6 @@
         if ($(".disccc").is(":checked")) {
             $(".discontinued").show();
         } else {
-            console.log("2nd")
             $(".discontinued").hide();
             document.getElementById("asses_max").value = ''
 
@@ -588,7 +564,6 @@
 
 
     function show(value) {
-        console.log(value)
         if (value == 'Integrated') {
             $(".selecttheropy").show();
         }
@@ -603,19 +578,14 @@
             document.getElementById('name_error_js').innerHTML = "This field is required"
             clearErrorMsg();
             return false
-
         }
-
-
     }
 
     function clearErrorMsg() {
         setTimeout(function () {
-            console.log("ashi")
             document.getElementById("name_error_js").innerHTML = '';
         }, 5000);
     }
-
 
 </script>
 

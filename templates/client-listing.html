@@ -449,21 +449,18 @@
                         document.getElementById('ST').checked = false;
                     }
                     else if (data.data[0]['asess_ls'] == 'BT, OT, ST') {
-                        console.log("All Match")
 
                         document.getElementById('BT').checked = true;
                         document.getElementById('OT').checked = true;
                         document.getElementById('ST').checked = true;
                     }
                     else if (data.data[0]['asess_ls'] == 'BT, OT') {
-                        console.log("All Match")
 
                         document.getElementById('BT').checked = true;
                         document.getElementById('OT').checked = true;
                         document.getElementById('ST').checked = false;
                     }
                     else if (data.data[0]['asess_ls'] == 'BT, ST') {
-                        console.log("All Match")
 
                         document.getElementById('BT').checked = true;
                         document.getElementById('OT').checked = false;
@@ -482,14 +479,6 @@
                         document.getElementById('ST').checked = false;
 
                     }
-
-
-
-
-
-
-
-
                 }
             });
         }
@@ -510,15 +499,12 @@
                 success: function (data) {
                     $("#mySelect").empty();
                     a = data.data[0]['assessment']
-                    console.log(a.length, "length")
                     if (a.length === 0){
-                        console.log("check krna")
                          $("#addassesment").hide();
                     }
                     else{
                         $("#addassesment").show();
                     }
-                    console.log(typeof a, "check as value lya")
                     $.each(a, function (key, value) {
                         $('#mySelect').append('<option value="' + value + '">' + (value == '-1' ? 'select' : value) + '</option>');
                     });
@@ -529,8 +515,6 @@
         });
 
         function doalert(checkboxElem, id, os, name) {
-
-            console.log(os.length, "ossss")
             var checkBox = document.getElementById("accept");
             var client_select = document.getElementById("client_select")
             var asses_select = document.getElementById("mySelect")
@@ -565,15 +549,8 @@
                 opt.setAttribute("disabled", "disabled");
                 opt.setAttribute("selected", "selected");
                 client_select.add(opt)
-
-
-
-
-
-
                 {% for k in client %}
                 value = {{ k.id }}
-            console.log(value, "value me hu")
             $.each('{{k.name}}'.split(','), function (key, value) {
                 $('#client_select').append('<option value="' + {{ k.id }} + '">' + (value == '-1' ? 'select' : value) + '</option>');
         });
@@ -587,7 +564,6 @@
         function modal_submit() {
             var client = document.getElementById("modal_form").elements.item(1).value;
             var assessment = document.getElementById("modal_form").elements.item(2).value.trim();
-            console.log(assessment, "model")
             if (assessment == "BT") {
                 window.location = "assesment/" + client;
             }
@@ -597,28 +573,12 @@
             else if (assessment == "OT") {
                 window.location = "otassesment_table/" + client;
             }
-
-            // document.getElementById("modal_form").submit()
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
         function datepicker() {
-            console.log("date")
 
             let date = $('#datepicker').val();
             search = $('#myInput').val();
-            console.log("date-piker", date)
 
             $.ajax({
                 type: "get",
@@ -627,12 +587,8 @@
                     'search': search,
                     'csrfmiddlewaretoken': '{{csrf_token}}'
                 },
-
                 success: function (data) {
-
-
                     $('#month-data').html(data['html']);
-
                 },
             });
         }
@@ -640,18 +596,14 @@
 
         function sort() {
             sort_by = $('#sortby').val();
-            console.log(sort_by)
             $.ajax({
                 type: "GET",
                 data: {
                     "sort_by": sort_by,
                     'csrfmiddlewaretoken': '{{csrf_token}}'
                 },
-
                 success: function (data) {
                     $('#month-data').html(data['html']);
-
-
                 },
             });
         }
@@ -659,8 +611,6 @@
         function myFunction() {
             search = $('#myInput').val();
             let date = $('#datepicker').val();
-            console.log("date-piker", date)
-            console.log(search, 'no search')
             $.ajax({
                 type: "GET",
                 data: {
@@ -670,10 +620,7 @@
                 },
 
                 success: function (data) {
-                    console.log(data, "data me h")
                     $('#month-data').html(data['html']);
-
-
                 },
             });
         }

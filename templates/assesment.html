@@ -178,7 +178,7 @@
 
     function maxs() {
         var test = document.getElementById("birthday")
-        console.log(test)
+
         var dtToday = new Date();
 
         var month = dtToday.getMonth() + 1;
@@ -191,7 +191,6 @@
             day = '0' + day.toString();
 
         var maxDate = year + '-' + month + '-' + day;
-        console.log(maxDate)
 
         document.getElementById("birthday")[0].setAttribute(maxDate);
 
@@ -212,7 +211,6 @@
             day = '0' + day.toString();
 
         var maxDate = year + '-' + month + '-' + day;
-        console.log(maxDate)
         $('#birthday').attr('max', maxDate);
 
 

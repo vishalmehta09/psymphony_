@@ -281,12 +281,6 @@
                     <label for="contactChoice3" class="toggle">SE</label>
                 </span>
 
-                <!-- <option id="bt" value="BT">BT</option>
-                <option id="ot" value="OT">OT</option>
-                <option id="st" value="ST">ST</option>
-                <option id="pt" value="PT">PT</option>
-                <option id="se" value="SE">SE</option> -->
-
 
 
             </div>
@@ -386,7 +380,6 @@
 
     function clearErrorMsg() {
         setTimeout(function () {
-            console.log("ashi")
             document.getElementById("name_error_js").innerHTML = '';
             document.getElementById("phone_error_js").innerHTML = '';
         }, 5000);
@@ -396,16 +389,7 @@
 
     function validateEmail() {
         var email = document.getElementById('email').value
-        // var letters = /^(\w+ ?)*$/;
-        // var name = document.getElementById('name').value
         var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
-
-
-        // if (!name.match(letters)) {
-        //     document.getElementById('email_error').innerHTML = "Only Characters and one space required in name field"
-        //     return false
-
-        // }
 
         if (reg.test(email) == false) {
             document.getElementById('email_error_js').innerHTML = "Invalid Email"
@@ -468,7 +452,6 @@
         var dob = new Date(userinput);
         var month_diff = Date.now() - dob.getTime();
         var age_dt = new Date(month_diff);
-        console.log("age_dt", age_dt)
         var year = age_dt.getUTCFullYear();
         var month = age_dt.getUTCMonth();
         var age = Math.abs(year - 1970);
@@ -521,7 +504,6 @@
     $(".selecttheropy").hide();
 
     function show(value) {
-        console.log(value)
         if (value == 'Integrated') {
             $(".selecttheropy").show();
         }
@@ -531,19 +513,5 @@
 
     }
 
-    // $("#name").on("blur", function () {
-    //     if ($(this).val().match('/^[a-z][a-z\s]*$/')) {
-    //         return true;
-    //     } else {
-    //         document.getElementById('email_error').innerHTML = "only char"
-    //     }
-    // });
-
-
-    // let text = document.getElementsByTagName("textarea").value
-    // let result = text.trim()
-
-    // console.log(result, 'result')
-    // console.log(text, 'text')
 </script>
 {% endblock %}

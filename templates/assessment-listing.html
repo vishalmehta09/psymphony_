@@ -98,27 +98,6 @@
                     <button class="btn btn-primary btn-sm" id="email_pdf{{clients.id}}" onclick="email_pdfs('{{clients.id}}')" class="email_pdf">Send PDF</button>
                 </td>
 
-
-
-
-
-                <!-- {% for assessment in blnk_dic|get_item:clients.id %}
-                {% if assessment == "ST" %}
-                <td><a href="update_stassesment/{{clients.id}}">{{clients.id}}</a></td>
-                {% elif assessment == "BT" %}
-                <td><a href="update_btassesment/{{clients.id}}">{{clients.id}}</a></td>
-                {% elif assessment == "OT" %}
-                <td><a href="update_otassesment/{{clients.id}}">{{clients.id}}</a></td>
-
-                {% endif %}
-                {%endfor%}
-
-                <td>{{ clients.name}}</td>
-                <td>{{ department}}</td>
-                <td>{{ username}}</td>
-                <td>{{ clients.assessment}}</td>
-                <td>{{ status|get_item:clients.id }}</td> -->
-
             </tr>
 
             {% endfor %}
@@ -212,9 +191,7 @@
 {% for clients in client %}
 {% if clients.assessment|length == 1 and status|get_item:clients.id == "Submited" %}
 $("#email_pdf" +{{clients.id}}).show()
-console.log({{clients.id}})
 {%else%}
-console.log({{clients.id}})
 $("#email_pdf" +{{clients.id}}).hide()
 {%endif%}
 {%endfor%} 
@@ -236,7 +213,6 @@ function email_pdfs(ids){
 });}
 
 catch{
-            console.log(document.getElementById("ass" +ids).innerHTML,ids)
         $.ajax({
             type: "GET",
             url: "send_mail/"+document.getElementById("ass" +ids).innerHTML+'/'+ids,
@@ -245,36 +221,10 @@ catch{
             }});}
 }
 
-        
-    // $.ajax({
-            
-    //         type: "GET",
-    //         url: "send_maissl/"+document.getElementById("gender" +id).innerHTML+'/'+id,
-    
-    //         success: function (data) {
-    //             console.log("f")
-    //             document.getElementById("email_pdf" +id).innerHTML="Sent"
-    //         }})}
-
-
-    
-
-    // catch{    
-    //     console.log(document.getElementById("ass" +id).innerHTML,id)
-    //     $.ajax({
-    //         type: "GET",
-    //         url: "send_mail/"+document.getElementById("ass" +id).innerHTML+'/'+id,
-    //         success: function (data) {
-
-    //             document.getElementById("email_pdf" +id).innerHTML="Sent"
-    //         }})}}
-
 
     function client_modal(id, ob, name) {
         $("#client_select").empty();
         $("#mySelect").empty();
-        console.log(id)
-        console.log(ob)
         var client_select = document.getElementById("client_select")
         var opt = document.createElement('option');
         opt.value = id
@@ -289,7 +239,6 @@ catch{
 
         var client = document.getElementById("modal_form").elements.item(1).value;
         var assessment = document.getElementById("modal_form").elements.item(2).value.trim();
-        console.log(assessment)
         if (assessment == "BT") {
             window.location = "update_btassesment/" + client;
         }
@@ -300,13 +249,11 @@ catch{
             window.location = "update_otassesment/" + client;
         }
 
-        // document.getElementById("modal_form").submit()
     }
 
 
 
     function assesment_status(id, obj, user_id) {
-        console.log(id, obj, user_id)
 
         $.ajax({
             type: "GET",
@@ -320,19 +267,6 @@ catch{
 
                 if (data.data[0]['Status']) {
                     document.getElementById(obj).value = data.data[0]['Status']
-
-                    // $.ajax({
-                    //     type: "GET",
-                    //     url: "download_pdf_file/" + obj,
-                    //     data: {
-                    //         'assesment_id': id,
-                    //         'csrfmiddlewaretoken': '{{csrf_token}}'
-
-                    //     },
-                    //     success: function (msg) {
-                    //         console.log('abc')
-                    //     }
-                    // });
 
 
                 }
@@ -353,7 +287,6 @@ catch{
                 if (data.data[0]['Status'] == "Submited") {
                     link = "download_pdf_file/" + obj + "?assesment_id=" + id
                     aTag = document.getElementById("pdf" + obj)
-                    console.log(aTag, 'atag1111')
                     aTag.href = link
                     aTag.innerHTML = "View PDF"
                     $("#email_pdf" +obj).show()
@@ -379,7 +312,6 @@ catch{
 
     function sort() {
         sort_by = $('#sortby').val();
-        console.log(sort_by)
         $.ajax({
             type: "GET",
             data: {
@@ -397,8 +329,6 @@ catch{
 
     function myFunction() {
         search = $('#myInput').val();
-        console.log(search)
-        console.log(search)
         $.ajax({
             type: "GET",
             data: {

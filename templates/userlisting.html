@@ -100,7 +100,6 @@
 
     function sort() {
         sort_by = $('#sortby').val();
-        console.log(sort_by)
         $.ajax({
             type: "GET",
             data: {
@@ -118,7 +117,6 @@
 
     function myFunction() {
         search = $('#myInput').val();
-        console.log(search)
         $.ajax({
             type: "GET",
             data: {
@@ -128,12 +126,8 @@
 
             success: function (data) {
                 $('#month-data').html(data['html']);
-
-
             },
         });
     }
-
-
 </script>
 {% endblock %}
