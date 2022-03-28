@@ -30,13 +30,6 @@ regex = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
 regex2 = r'\b^[a-zA-Z ]*$\b'
 
 phone_regex = r"^(\d{10}|\d{11}|\d{12})$"
-# def check(email):
-#     if(re.fullmatch(regex, email)):
-#         pass
-
-#     else:
-#         messages.error(request, 'Email is invalid')
-#         re
 
 
 def login_user(request):
@@ -81,52 +74,37 @@ class ClientListing(View):
         date = request.GET.get("date", None)
         sort_by = request.GET.get("sort_by", None)
         search = request.GET.get("search", None)
-        print(date, "date-view")
-        print(request.GET, 'request.GET,request.GET')
         if request.GET.get("search") and request.GET.get("date"):
-            print("me hu dono me")
             blnk_dic = {}
             clients = ClientTable.objects.filter(
-                
                 Q(name__icontains=request.GET.get("search"))
                 | Q(phone__icontains=request.GET.get("search"))
                 | Q(id__icontains=request.GET.get("search")),created_on=request.GET.get("date") ,user=request.user)
-            print(clients, "clientss check both")
             for k in clients:
                 blnk_dic[k.id] = k.assessment
-            print(clients,'clients')
             page = request.GET.get("page", 1)
-
             paginator = Paginator(clients, 10)
-
             try:
                 client = paginator.page(page)
-                print("client", client)
             except PageNotAnInteger:
                 client = paginator.page(1)
-                print("client", client)
             except EmptyPage:
                 client = paginator.page(paginator.num_pages)
             html = render_to_string("listing-filter.html", {"client": client,"blnk_dic":blnk_dic})
             return JsonResponse({"html": html})
         if request.GET.get("date") and not request.GET.get("search"):
             blnk_dic = {}
-            print("in date")
             clients = ClientTable.objects.filter(created_on=request.GET.get("date") ,user=request.user)
             for k in clients:
                 blnk_dic[k.id] = k.assessment
-            print(clients,'clients')
-            print(blnk_dic, 'blank')
             page = request.GET.get("page", 1)
 
             paginator = Paginator(clients, 10)
 
             try:
                 client = paginator.page(page)
-                print("client", client)
             except PageNotAnInteger:
                 client = paginator.page(1)
-                print("client", client)
             except EmptyPage:
                 client = paginator.page(paginator.num_pages)
             html = render_to_string("listing-filter.html", {"client": client,"blnk_dic":blnk_dic})
@@ -134,24 +112,19 @@ class ClientListing(View):
         if sort_by == "dsc":
             status = {}
             blnk_dic = {}
-            
             clients = ClientTable.objects.filter(user=request.user).order_by("id")
             for k in clients:
                 blnk_dic[k.id] = k.assessment
-
                 try:
                     status_client = Assesment.objects.get(clienttable=k.id)
                     status[k.id] = status_client.Status
-
                 except Assesment.DoesNotExist:
                     pass
-
                 try:
                     status_client = STAssesment.objects.get(clienttable=k.id)
                     status[k.id] = status_client.Status
                 except STAssesment.DoesNotExist:
                     pass
-
                 try:
                     status_client = OTAssesment.objects.get(clienttable=k.id)
                     status[k.id] = status_client.Status
@@ -166,7 +139,6 @@ class ClientListing(View):
                 client = paginator.page(1)
             except EmptyPage:
                 client = paginator.page(paginator.num_pages)
-            print(client)
             html = render_to_string("listing-filter.html", {"client": client,"blnk_dic":blnk_dic})
             return JsonResponse({"html": html})
         if sort_by == "asc":
@@ -175,27 +147,22 @@ class ClientListing(View):
             clients = ClientTable.objects.filter(user=request.user).order_by("-id")
             for k in clients:
                 blnk_dic[k.id] = k.assessment
-
                 try:
                     status_client = Assesment.objects.get(clienttable=k.id)
                     status[k.id] = status_client.Status
-
                 except Assesment.DoesNotExist:
                     pass
-
                 try:
                     status_client = STAssesment.objects.get(clienttable=k.id)
                     status[k.id] = status_client.Status
                 except STAssesment.DoesNotExist:
                     pass
-
                 try:
                     status_client = OTAssesment.objects.get(clienttable=k.id)
                     status[k.id] = status_client.Status
                 except OTAssesment.DoesNotExist:
                     pass
             page = request.GET.get("page", 1)
-
             paginator = Paginator(clients, 10)
             try:
                 client = paginator.page(page)
@@ -209,9 +176,7 @@ class ClientListing(View):
             return JsonResponse({"html": html})
         if request.GET.get("search") and not request.GET.get("date"):
             blnk_dic = {}
-            print("I AM SEARCH", search)
             clients = ClientTable.objects.filter(
-                
                 Q(name__icontains=request.GET.get("search"))
                 | Q(phone__icontains=request.GET.get("search"))
                 | Q(id__icontains=request.GET.get("search")),user=request.user
@@ -238,9 +203,7 @@ class ClientListing(View):
             clients = ClientTable.objects.filter(user=request.user)
             for k in clients:
                 blnk_dic[k.id] = k.assessment
-
             page = request.GET.get("page", 1)
-
             paginator = Paginator(clients, 10)
             try:
                 client = paginator.page(page)
@@ -252,15 +215,12 @@ class ClientListing(View):
                 "listing-filter.html", {"client": client, "blnk_dic": blnk_dic}
             )
             return JsonResponse({"html": html})
-
         else:
             blnk_dic = {}
             client_list = ClientTable.objects.filter(user=request.user)
             for k in client_list:
                 blnk_dic[k.id] = k.assessment
-            print(blnk_dic)
             page = request.GET.get("page", 1)
-
             paginator = Paginator(client_list, 10)
             try:
                 client = paginator.page(page)
@@ -278,34 +238,21 @@ class Client(View):
     def get(self, request):
         return render(request, "client.html")
 
-
-
     def post(self, request):
-        print(request.POST.values, "values")
-        
-        
         if request.POST.get("email") != '':
             if ClientTable.objects.filter(email=request.POST.get("email")).exists():
                 return render(request, "client.html", {"email_error": "Email already exists"})
             if not re.fullmatch(regex, request.POST.get("email")):
-                print("exist4")
                 return render(request, "client.html", {"email_error": "Email is not valid"})
-            
-
         if not re.fullmatch(regex2, request.POST.get("name")):
-            print("exist6")
             return render(request,"client.html",{"name_error": "Only Characters are required"})
         if request.POST.get("mother_tongue") != '':
             if not re.fullmatch(regex2, request.POST.get("mother_tongue")):
-                print("exist3")
                 return render(request, 'client.html',{'mother_tongue_error':'Only Characters are required'})
-
         if request.POST.get("phone") != '':
             if not re.fullmatch(phone_regex, request.POST.get("phone")):
-                print("exist")
                 return render(request, "client.html", {"phone_error": "Phone number is not valid"})
             if ClientTable.objects.filter(phone=request.POST.get("phone")).exists():
-                print("exist5")
                 return render(request, "client.html", {"phone_error": "Mobile number already exists"})
         if request.POST.get("alternate_phone") != '' and not re.fullmatch(phone_regex, request.POST.get("alternate_phone")):
             return render(request,"client.html",{"alternate_error": "Alternate Phone number is not valid"})
@@ -383,8 +330,6 @@ class Client(View):
                 created_on=created_on,
                 created_by=request.user.username,
             )
-            print("ARRIVEDD")
-            print(type(theropy))
             messages.success(request, "Form created successful")
             return redirect("dashboard")
 
@@ -400,7 +345,6 @@ def dashboard(request):
             labels.append(city.assessment)
             data.append(city.assessment)
         passed = labels
-        print(passed, 'passed')
         res = []
 
         for x in passed:
@@ -409,42 +353,11 @@ def dashboard(request):
                     res.append(b)
             else:
                 res.append(x)
-        print('res',res)
        
         results = {value: len(list(freq)) for value, freq in groupby(sorted(res))}
 
         res_key = list(results.keys())
         res_val = list(results.values())
-
-        # res = []
-        # for x in passed:
-        #     if type(list(x)) == list:
-        #         for b in x:
-        #             res.append(b)
-        #     else:
-        #         res.append(x)
-        # print('res',res)
-        # b = set(res)
-        # a= list(b)
-        # print(a,'a')
-        # total_count = []
-        # count_st = 0
-        # count_bt = 0
-        # count_ot = 0
-        # for k in res:
-        #     if k == "ST":
-        #         count_st += 1
-        #     elif k == "BT":
-        #         count_bt += 1
-        #     elif k == "OT":
-        #         count_ot += 1
-        # if count_st!=0:
-        #     total_count.append(count_st)
-        # if count_bt!=0:
-        #     total_count.append(count_bt)
-        # if count_ot!=0:
-        #     total_count.append(count_ot)
-        # print(total_count, "total count")
         return render(request, "listing-dashboard.html", {"labels": res_key, "data": res_val})
 
 
@@ -453,23 +366,16 @@ class update(View):
     def get(self, request, id):
         theropy_select = []
         assesment_client = []
-        
         client = ClientTable.objects.get(id=id,user=request.user)
-        
         for k in client.theropyselect:
             theropy_select.append(k)
-
         assesment_client.append(str(client.assessment))
-        print(theropy_select, 'theropy_select')
         return render(request, "edit-client.html", {"client": client,"assesment_client":assesment_client,"theropy":client.theropy, "theropy_select":theropy_select})
 
     def post(self, request, id):
-        print("postttt", request.POST.getlist("assessment"))
         client = ClientTable.objects.get(id=id,user=request.user)
-        print(client.assessment,type(client.assessment))
         if request.POST.get("email") != '':
             if not re.fullmatch(regex, request.POST.get("email")):
-                print("exist4")
                 return render(request, 'edit-client.html',{'email_error':'Email is not valid','update_asses':request.POST.getlist("assessment"),'update_theropy':request.POST.getlist("theropy")})
         if not re.fullmatch(regex2, request.POST.get('name').strip()):
             return render(request, 'edit-client.html',{'name_error':'Only Characters are required','update_asses':request.POST.getlist("assessment"),'update_theropy':request.POST.getlist("theropy")})
@@ -543,18 +449,12 @@ class update(View):
         return redirect("client_listing")
 
 
-# def update(request, id):
-#     client = ClientTable.objects.get(id = id)
-#     return render(request, 'edit-client.html', {'client':client})
-
-
 class UserListing(View):
     @method_decorator(login_required(login_url="login"))
     def get(self, request):
         sort_by = request.GET.get("sort_by")
         search = request.GET.get("search")
         if sort_by == "dsc":
-            print("dsc")
             clients = User.objects.filter(created_by=request.user).order_by("id")
             page = request.GET.get("page", 1)
 
@@ -565,11 +465,9 @@ class UserListing(View):
                 client = paginator.page(1)
             except EmptyPage:
                 client = paginator.page(paginator.num_pages)
-            print(clients)
             html = render_to_string("listing-user-filter.html", {"client": client})
             return JsonResponse({"html": html})
         if sort_by == "asc":
-            print("asc")
             clients = User.objects.filter(created_by=request.user).order_by("-id")
             page = request.GET.get("page", 1)
 
@@ -583,13 +481,11 @@ class UserListing(View):
             html = render_to_string("listing-user-filter.html", {"client": client})
             return JsonResponse({"html": html})
         if search:
-            print(request.GET.get("search"))
             clients = User.objects.filter(
                 Q(username__icontains=request.GET.get("search"))
                 | Q(department__icontains=request.GET.get("search")),created_by=request.user
             )
             page = request.GET.get("page", 1)
-
             paginator = Paginator(clients, 10)
             try:
                 client = paginator.page(page)
@@ -599,7 +495,6 @@ class UserListing(View):
                 client = paginator.page(paginator.num_pages)
             html = render_to_string("listing-user-filter.html", {"client": client})
             return JsonResponse({"html": html})
-
         elif search == "":
             clients = User.objects.filter(created_by=request.user)
             page = request.GET.get("page", 1)
@@ -617,7 +512,6 @@ class UserListing(View):
         else:
             user_list = User.objects.filter(created_by=request.user)
             page = request.GET.get("page", 1)
-
             paginator = Paginator(user_list, 10)
             try:
                 user = paginator.page(page)
@@ -670,8 +564,6 @@ class assesment(View):
         return render(request, "assesment.html", {"client": client})
 
     def post(self, request, id):
-        print(request.POST.getlist("tests_administered"), "dsfbewbfwjfejbfjewbfjweb")
-
         if request.POST.get('email_sent') == "on":
             template_data = {'client_name': request.POST.get("name"), 'client_address': request.POST.get("address"),
                                 'assignment_name': ['BT'],
@@ -694,7 +586,6 @@ class assesment(View):
             Status = "Draft"
         else:
             Status = "Submited"
-        print(Status)
         if request.POST.get("Submited"):
             version = "Submited"
         else:
@@ -855,7 +746,6 @@ class AssessmentListing(View):
 
         sort_by = request.GET.get("sort_by")
         search = request.GET.get("search")
-        print(search, "search")
         status = {}
         if sort_by == "dsc":
             status = {}
@@ -866,7 +756,6 @@ class AssessmentListing(View):
             for a in clients:
                 try:
                     status_client = Assesment.objects.get(clienttable=a.id)
-                    print("CHK", status_client)
                     status[a.id] = status_client.Status
 
                 except Assesment.DoesNotExist as e:
@@ -875,14 +764,12 @@ class AssessmentListing(View):
                 try:
                     status_client = STAssesment.objects.get(clienttable=a.id)
                     status[a.id] = status_client.Status
-                    print("CHK", status_client)
                 except STAssesment.DoesNotExist as e:
                     status[a.id] = "None"
 
                 try:
                     status_client = OTAssesment.objects.get(clienttable=a.id)
                     status[a.id] = status_client.Status
-                    print("CHK", status_client)
                 except OTAssesment.DoesNotExist as e:
                     status[a.id] = "None"
             page = request.GET.get("page", 1)
@@ -894,7 +781,6 @@ class AssessmentListing(View):
                 client = paginator.page(1)
             except EmptyPage:
                 client = paginator.page(paginator.num_pages)
-            print(client)
             html = render_to_string(
                 "listing-assessment-filter.html", {"client": client,'blnk_dic':blnk_dic,'status':status}
             )
@@ -908,7 +794,6 @@ class AssessmentListing(View):
             for a in clients:
                 try:
                     status_client = Assesment.objects.get(clienttable=a.id)
-                    print("CHK", status_client)
                     status[a.id] = status_client.Status
 
                 except Assesment.DoesNotExist as e:
@@ -917,18 +802,15 @@ class AssessmentListing(View):
                 try:
                     status_client = STAssesment.objects.get(clienttable=a.id)
                     status[a.id] = status_client.Status
-                    print("CHK", status_client)
                 except STAssesment.DoesNotExist as e:
                     status[a.id] = "None"
 
                 try:
                     status_client = OTAssesment.objects.get(clienttable=a.id)
                     status[a.id] = status_client.Status
-                    print("CHK", status_client)
                 except OTAssesment.DoesNotExist as e:
                     status[a.id] = "None"
             page = request.GET.get("page", 1)
-            print("i am status ", status)
 
             paginator = Paginator(clients, 10)
             try:
@@ -937,7 +819,6 @@ class AssessmentListing(View):
                 client = paginator.page(1)
             except EmptyPage:
                 client = paginator.page(paginator.num_pages)
-            print(status)
             html = render_to_string(
                 "listing-assessment-filter.html", {"client": client,"status":status,"blnk_dic":blnk_dic}
             )
@@ -951,14 +832,12 @@ class AssessmentListing(View):
                 | Q(name__icontains=request.GET.get("search"))
                 | Q(id__icontains=request.GET.get("search")),user=request.user
             )
-            # newly added
             for s in clients:
                 blnk_dic[s.id] = s.assessment
 
             for a in clients:
                 try:
                     status_client = Assesment.objects.get(clienttable=a.id)
-                    print("CHK", status_client)
                     status[a.id] = status_client.Status
 
                 except Assesment.DoesNotExist as e:
@@ -967,14 +846,12 @@ class AssessmentListing(View):
                 try:
                     status_client = STAssesment.objects.get(clienttable=a.id)
                     status[a.id] = status_client.Status
-                    print("CHK", status_client)
                 except STAssesment.DoesNotExist as e:
                     status[a.id] = "None"
 
                 try:
                     status_client = OTAssesment.objects.get(clienttable=a.id)
                     status[a.id] = status_client.Status
-                    print("CHK", status_client)
                 except OTAssesment.DoesNotExist as e:
                     status[a.id] = "None"
 
@@ -985,7 +862,6 @@ class AssessmentListing(View):
             client_ass = ClientTable.objects.filter(user=request.user)
             
             for a in client_ass:
-                print(a.id)
                 try:
                     status_client = Assesment.objects.get(clienttable=a.id)
                     status[a.id] = status_client.Status
@@ -1027,7 +903,6 @@ class AssessmentListing(View):
             )
             return JsonResponse({"html": html})
         elif search == "":
-            print("dscdfdsfhfhbhshfhbhb")
             status = {}
             blnk_dic={}
             clients = ClientTable.objects.filter(user=request.user)
@@ -1078,10 +953,7 @@ class AssessmentListing(View):
             client_ass = ClientTable.objects.filter(user=request.user)
             for k in client_ass:
                 blnk_dic[k.id]=k.assessment
-            print(blnk_dic)
-            print("client_assesment", client_ass)
             for a in client_ass:
-                print(a.id, "check a ki id")
                 try:
                     status_client = Assesment.objects.get(clienttable=a.id)
                     status[a.id] = status_client.Status
@@ -1102,8 +974,6 @@ class AssessmentListing(View):
                     pass
 
             page = request.GET.get("page", 1)
-            print("i am status ", status)
-
             paginator = Paginator(client_ass, 10)
             try:
                 client = paginator.page(page)
@@ -1140,7 +1010,6 @@ class UpdateBtAssessment(View):
             return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
     def post(self, request, id):
-        print(request.POST.getlist("tests_administered"), "hwey degew")
         client = Assesment.objects.get(clienttable__id=id)
         client.date_of_assessment= request.POST.get('date_of_assessment')
         client.prenatal_history = re.sub(
@@ -1347,7 +1216,6 @@ def send_mail(request,assesment_id,id):
     p = canvas.Canvas(buffer)
 
     data = ClientTable.objects.filter(id=id)
-    print(data)
 
     for k in data:
         if assesment_id == "BT":
@@ -1410,7 +1278,6 @@ def send_mail_pdf(request):
     p = canvas.Canvas(buffer)
 
     data = ClientTable.objects.filter(id=request.GET.get('id'))
-    print(data)
 
     for k in data:
         if request.GET.get("assesment_id") == "BT":
