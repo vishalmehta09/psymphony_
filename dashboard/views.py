@@ -34,7 +34,6 @@ phone_regex = r"^(\d{10}|\d{11}|\d{12})$"
 
 def login_user(request):
     if request.method == "POST":
-        print(request.POST.values())
         username = request.POST["username"]
         password = request.POST["password"]
         user = authenticate(username=username, password=password)
@@ -57,7 +56,6 @@ class ClientListing(View):
             return JsonResponse({'data': resp}, safe=False)
 
         if request.GET.get('id') and request.GET.get('client_modal'):
-            print("Trig")
             asess_ls=[]
             ob = ClientTable.objects.get(id=request.GET.get('id'),user=request.user)
             asess_ls.append(str(ob.assessment))
@@ -1175,7 +1173,6 @@ def download_pdf_file(request, id):
 
             with fs.open("mypdf.pdf") as pdf:
                 response = HttpResponse(pdf, content_type="application/pdf")
-                print("response1", response)
                 response["Content-Disposition"] = 'attachment; filename="mypdf.pdf"'
             return response
 
@@ -1190,7 +1187,6 @@ def download_pdf_file(request, id):
 
             with fs.open("mypdf.pdf") as pdf:
                 response = HttpResponse(pdf, content_type="application/pdf")
-                print("response1", response)
                 response["Content-Disposition"] = 'attachment; filename="mypdf.pdf"'
             return response
 
@@ -1204,7 +1200,6 @@ def download_pdf_file(request, id):
 
             with fs.open("mypdf.pdf") as pdf:
                 response = HttpResponse(pdf, content_type="application/pdf")
-                print("response1", response)
                 response["Content-Disposition"] = 'attachment; filename="mypdf.pdf"'
 
             return response
