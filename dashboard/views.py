@@ -1232,37 +1232,37 @@ def send_mail(request,assesment_id,id):
 
 
         if assesment_id == "OT":
-            assesment_data = OTAssesment.objects.filter(clienttable=k.id)
-            html_string = render_to_pdf(
+            assesment_data = Assesment.objects.filter(clienttable=k.id)
+            html_string = render_to_string(
                 "OT_pdf.html", {"data": assesment_data, "client_data": data}
             )
 
-            subject = "OT Assesment"
-            get_email = ClientTable.objects.get(id=id)
+            html = HTML(string=html_string)
+            subject = "Send Pdf"
+            get_email = ClientTable.objects.get(id=int(id))
             to_email = get_email.email
             from_email = settings.EMAIL_HOST_USER
-
             text_content = "OT Assesment"
             from_email = settings.EMAIL_HOST_USER
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
-            msg.attach("file.pdf", html_string, "application/pdf")
+            msg.attach("file.pdf", html.write_pdf(), "application/pdf")
             msg.send()
 
         if assesment_id == "ST":
-            assesment_data = STAssesment.objects.filter(clienttable=k.id)
-            html_string = render_to_pdf(
+            assesment_data = Assesment.objects.filter(clienttable=k.id)
+            html_string = render_to_string(
                 "ST_pdf.html", {"data": assesment_data, "client_data": data}
             )
 
-            subject = "ST Assesment"
-            get_email = ClientTable.objects.get(id=id)
+            html = HTML(string=html_string)
+            subject = "Send Pdf"
+            get_email = ClientTable.objects.get(id=int(id))
             to_email = get_email.email
             from_email = settings.EMAIL_HOST_USER
-
-            text_content = "This is an important message."
+            text_content = "ST Assesment"
             from_email = settings.EMAIL_HOST_USER
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
-            msg.attach("file.pdf", html_string, "application/pdf")
+            msg.attach("file.pdf", html.write_pdf(), "application/pdf")
             msg.send()
         return JsonResponse("Done",safe=False)
     
