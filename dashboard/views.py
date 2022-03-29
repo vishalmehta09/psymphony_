@@ -1232,7 +1232,7 @@ def send_mail(request,assesment_id,id):
 
 
         if assesment_id == "OT":
-            assesment_data = Assesment.objects.filter(clienttable=k.id)
+            assesment_data = OTAssesment.objects.filter(clienttable=k.id)
             html_string = render_to_string(
                 "OT_pdf.html", {"data": assesment_data, "client_data": data}
             )
@@ -1249,7 +1249,7 @@ def send_mail(request,assesment_id,id):
             msg.send()
 
         if assesment_id == "ST":
-            assesment_data = Assesment.objects.filter(clienttable=k.id)
+            assesment_data = STAssesment.objects.filter(clienttable=k.id)
             html_string = render_to_string(
                 "ST_pdf.html", {"data": assesment_data, "client_data": data}
             )
