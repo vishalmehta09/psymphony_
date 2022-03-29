@@ -1277,6 +1277,7 @@ def send_mail_pdf(request):
     for k in data:
         if request.GET.get("assesment_id") == "BT":
             assesment_data = Assesment.objects.filter(clienttable=k.id)
+            print(assesment_data, 'assesment_data_iddd')
             html_string = render_to_string(
                 "BT_pdf.html", {"data": assesment_data, "client_data": data}
             )
@@ -1285,7 +1286,6 @@ def send_mail_pdf(request):
             subject = "Send Pdf"
             get_email = ClientTable.objects.get(id=request.GET.get('id'))
             to_email = get_email.email
-            from_email = settings.EMAIL_HOST_USER
             text_content = "BT Assesment"
             from_email = settings.EMAIL_HOST_USER
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
@@ -1295,36 +1295,35 @@ def send_mail_pdf(request):
 
         if request.GET.get("assesment_id") == "OT":
             assesment_data = OTAssesment.objects.filter(clienttable=k.id)
-            html_string = render_to_pdf(
+            print(assesment_data, 'assesment_data_iddd22222222')
+            html_string = render_to_string(
                 "OT_pdf.html", {"data": assesment_data, "client_data": data}
             )
 
-            subject = "OT Assesment"
+            html = HTML(string=html_string)
+            subject = "Send Pdf"
             get_email = ClientTable.objects.get(id=request.GET.get('id'))
             to_email = get_email.email
-            from_email = settings.EMAIL_HOST_USER
-
             text_content = "OT Assesment"
             from_email = settings.EMAIL_HOST_USER
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
-            msg.attach("file.pdf", html_string, "application/pdf")
+            msg.attach("file.pdf", html.write_pdf(), "application/pdf")
             msg.send()
 
         if request.GET.get("assesment_id") == "ST":
             assesment_data = STAssesment.objects.filter(clienttable=k.id)
-            html_string = render_to_pdf(
+            print(assesment_data, 'assesment_data_iddd11111')
+            html_string = render_to_string(
                 "ST_pdf.html", {"data": assesment_data, "client_data": data}
             )
 
-            subject = "ST Assesment"
+            html = HTML(string=html_string)
+            subject = "Send Pdf"
             get_email = ClientTable.objects.get(id=request.GET.get('id'))
             to_email = get_email.email
-            from_email = settings.EMAIL_HOST_USER
-
-            text_content = "This is an important message."
+            text_content = "ST Assesment"
             from_email = settings.EMAIL_HOST_USER
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
-            msg.attach("file.pdf", html_string, "application/pdf")
+            msg.attach("file.pdf", html.write_pdf(), "application/pdf")
             msg.send()
         return JsonResponse("Done",safe=False)
-      
