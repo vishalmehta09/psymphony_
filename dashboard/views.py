@@ -20,7 +20,7 @@ from .helpers import *
 from django.core.files.storage import FileSystemStorage
 from io import BytesIO
 from reportlab.pdfgen import canvas
-from weasyprint import HTML
+from weasyprint import HTML, CSS
 from itertools import groupby
 from .helpers import render_to_pdf
 
@@ -1168,7 +1168,7 @@ def download_pdf_file(request, id):
 
             html = HTML(string=html_string)
 
-            html.write_pdf(target="/tmp/mypdf.pdf")
+            html.write_pdf(target="/tmp/mypdf.pdf", stylesheets=[CSS('http://127.0.0.1:8000/static/pdf/css/style.css')])
             fs = FileSystemStorage("/tmp")
 
             with fs.open("mypdf.pdf") as pdf:
@@ -1182,7 +1182,7 @@ def download_pdf_file(request, id):
             html_string = render_to_string("OT_pdf.html", {"data": assesment_data,"client_data":data})
             html = HTML(string=html_string)
 
-            html.write_pdf(target="/tmp/mypdf.pdf")
+            html.write_pdf(target="/tmp/mypdf.pdf", stylesheets=[CSS('http://127.0.0.1:8000/static/pdf/css/style.css')])
             fs = FileSystemStorage("/tmp")
 
             with fs.open("mypdf.pdf") as pdf:
@@ -1195,7 +1195,7 @@ def download_pdf_file(request, id):
             html_string = render_to_string("ST_pdf.html", {"data": assesment_data,"client_data":data})
             html = HTML(string=html_string)
 
-            html.write_pdf(target="/tmp/mypdf.pdf")
+            html.write_pdf(target="/tmp/mypdf.pdf", stylesheets=[CSS('http://127.0.0.1:8000/static/pdf/css/style.css')])
             fs = FileSystemStorage("/tmp")
 
             with fs.open("mypdf.pdf") as pdf:
@@ -1227,7 +1227,7 @@ def send_mail(request,assesment_id,id):
             text_content = "BT Assesment"
             from_email = settings.EMAIL_HOST_USER
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
-            msg.attach("file.pdf", html.write_pdf(), "application/pdf")
+            msg.attach("file.pdf", html.write_pdf(stylesheets=[CSS('http://127.0.0.1:8000/static/pdf/css/style.css')]), "application/pdf")
             msg.send()
 
 
@@ -1245,7 +1245,7 @@ def send_mail(request,assesment_id,id):
             text_content = "OT Assesment"
             from_email = settings.EMAIL_HOST_USER
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
-            msg.attach("file.pdf", html.write_pdf(), "application/pdf")
+            msg.attach("file.pdf", html.write_pdf(stylesheets=[CSS('http://127.0.0.1:8000/static/pdf/css/style.css')]), "application/pdf")
             msg.send()
 
         if assesment_id == "ST":
@@ -1262,7 +1262,7 @@ def send_mail(request,assesment_id,id):
             text_content = "ST Assesment"
             from_email = settings.EMAIL_HOST_USER
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
-            msg.attach("file.pdf", html.write_pdf(), "application/pdf")
+            msg.attach("file.pdf", html.write_pdf(stylesheets=[CSS('http://127.0.0.1:8000/static/pdf/css/style.css')]), "application/pdf")
             msg.send()
         return JsonResponse("Done",safe=False)
     
@@ -1277,7 +1277,6 @@ def send_mail_pdf(request):
     for k in data:
         if request.GET.get("assesment_id") == "BT":
             assesment_data = Assesment.objects.filter(clienttable=k.id)
-            print(assesment_data, 'assesment_data_iddd')
             html_string = render_to_string(
                 "BT_pdf.html", {"data": assesment_data, "client_data": data}
             )
@@ -1289,7 +1288,7 @@ def send_mail_pdf(request):
             text_content = "BT Assesment"
             from_email = settings.EMAIL_HOST_USER
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
-            msg.attach("file.pdf", html.write_pdf(), "application/pdf")
+            msg.attach("file.pdf", html.write_pdf(stylesheets=[CSS('http://127.0.0.1:8000/static/pdf/css/style.css')]), "application/pdf")
             msg.send()
 
 
@@ -1307,7 +1306,7 @@ def send_mail_pdf(request):
             text_content = "OT Assesment"
             from_email = settings.EMAIL_HOST_USER
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
-            msg.attach("file.pdf", html.write_pdf(), "application/pdf")
+            msg.attach("file.pdf", html.write_pdf(stylesheets=[CSS('http://127.0.0.1:8000/static/pdf/css/style.css')]), "application/pdf")
             msg.send()
 
         if request.GET.get("assesment_id") == "ST":
@@ -1324,6 +1323,6 @@ def send_mail_pdf(request):
             text_content = "ST Assesment"
             from_email = settings.EMAIL_HOST_USER
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
-            msg.attach("file.pdf", html.write_pdf(), "application/pdf")
+            msg.attach("file.pdf", html.write_pdf(stylesheets=[CSS('http://127.0.0.1:8000/static/pdf/css/style.css')]), "application/pdf")
             msg.send()
         return JsonResponse("Done",safe=False)

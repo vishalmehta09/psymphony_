@@ -23,4 +23,5 @@ urlpatterns = [
 
     path("send_mail_pdf/", send_mail_pdf, name="send_mail_pdf"),
 
+
 ]
