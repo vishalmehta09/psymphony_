@@ -217,7 +217,7 @@
                         </div>
                         <div class="dd mt-2">
                             <label>Send Mail</label>
-                            <input type="checkbox" id="send_mail" name="send_mail">
+                            <input type="checkbox" id="send_mail" name="send_mail" hidden>
 
                         </div>
                     </div>
@@ -504,7 +504,7 @@
     $(".selecttheropy").hide();
 
     function show(value) {
-        if (value == 'Integrated') {
+        if (value == 'Individual') {
             $(".selecttheropy").show();
         }
         else {

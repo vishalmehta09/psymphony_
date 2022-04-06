@@ -21,124 +21,130 @@
                 <option value="asc">Latest</option>
                 <option value="dsc">Oldest</option>
             </select>
-        </div>
-    </div>
+        </div> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   
 
-    <table class="table table-bordered month-data" id="month-data">
+     </div>
+</div>
+<table class="table table-bordered month-data" id="month-data">
 
-        <thead>
+    <thead>
 
 
-            <tr>
-                <th>Client Id</th>
-                <th>Name</th>
-                <th>Department</th>
-                <th>Username</th>
-                <th>Assesments</th>
-                <th>Status</th>
-                <th>PDF</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {%if client%}
+        <tr>
+            <th>Client Id</th>
+            <th>Name</th>
+            <th>Department</th>
+            <th>Username</th>
+            <th>Assesments</th>
+            <th>Status</th>
+            <th>PDF</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {%if client%}
 
-            {% for clients in client %}
-            <tr>
+        {% for clients in client %}
+        <tr>
 
-                <td><center><a href="#" data-toggle="modal" data-target="#exampleModal1"
+            <td>
+                <center><a href="#" data-toggle="modal" data-target="#exampleModal1"
                         onclick="client_modal('{{clients.id}}','{{blnk_dic|get_item:clients.id}}','{{clients.name}}')">{{clients.id}}</a>
-                </center></td>
-                <td>{{clients.name}}</td>
-                <td>{{clients.user.department}}</td>
-                <td>{{clients.user}}</td>
-                <td style="width: 22px;">
-                    {% if clients.assessment|length > 1 %}
-                    <div class="demographic-item">
-                        <select name="gender" id="gender{{clients.id}}"
-                            onchange="assesment_status(value,'{{clients.id}}','{{clients.user.id}}')"
-                            style="background: transparent; ">
-                            <option value="" selected disabled>View Status</option>
-                            {% for assessment in blnk_dic|get_item:clients.id %}
+                </center>
+            </td>
+            <td>{{clients.name}}</td>
+            <td>{{clients.user.department}}</td>
+            <td>{{clients.user}}</td>
+            <td style="width: 22px;">
+                {% if clients.assessment|length > 1 %}
+                <div class="demographic-item">
+                    <select name="gender" id="gender{{clients.id}}"
+                        onchange="assesment_status(value,'{{clients.id}}','{{clients.user.id}}')"
+                        style="background: transparent; ">
+                        <option value="" selected disabled>View Status</option>
+                        {% for assessment in blnk_dic|get_item:clients.id %}
 
-                            <option value="{{assessment}}" id="status_acess" name=status_acess{{clients.id}}>{{assessment}}</option>
-                            {%endfor%}
+                        <option value="{{assessment}}" id="status_acess" name=status_acess{{clients.id}}>{{assessment}}
+                        </option>
+                        {%endfor%}
 
-                        </select>
-                        {%else%}
-                        <span id=ass{{clients.id}}>{{clients.assessment}}</span>
-                        {%endif%}
-                </td>
-                <td>
-                    {% if clients.assessment|length > 1 %}
-                    <input readonly type="text" id="{{clients.id}}" value="Select Assesment"
-                        style="background: transparent; border:none;">
+                    </select>
                     {%else%}
-                    {% if status|get_item:clients.id == none %}
-                    Not Started
-                    {%else%}
-                    {{status|get_item:clients.id}}
+                    <span id=ass{{clients.id}}>{{clients.assessment}}</span>
                     {%endif%}
-                    {%endif%}
-                </td>
-                <td>
-                    {% if clients.assessment|length == 1 and status|get_item:clients.id == "Submited" %}
+            </td>
+            <td>
+                {% if clients.assessment|length > 1 %}
+                <input readonly type="text" id="{{clients.id}}" value="Select Assesment"
+                    style="background: transparent; border:none;">
+                {%else%}
+                {% if status|get_item:clients.id == none %}
+                Not Started
+                {%else%}
+                {{status|get_item:clients.id}}
+                {%endif%}
+                {%endif%}
+            </td>
+            <td>
+                {% if clients.assessment|length == 1 and status|get_item:clients.id == "Submited" %}
 
-                    <a href="download_pdf_file/{{clients.id}}?assesment_id={{clients.assessment}}" class=" pdfclass"
-                        id="pdf{{clients.id}}" value="Select Assesment">View Pdf
-                    </a>
-                    
-                    {%else%}
-                    <a class="pdfclass" id="pdf{{clients.id}}" value="Select Assesment">NO PDF Available
-                    </a>
-                    {%endif%}
-                </td>
+                <a href="download_pdf_file/{{clients.id}}?assesment_id={{clients.assessment}}" class=" pdfclass"
+                    id="pdf{{clients.id}}" value="Select Assesment">View Pdf
+                </a>
 
-                <td>
-                    <button class="btn btn-primary btn-sm" id="email_pdf{{clients.id}}" onclick="email_pdfs('{{clients.id}}')" class="email_pdf">Send PDF</button>
-                </td>
+                {%else%}
+                <a class="pdfclass" id="pdf{{clients.id}}" value="Select Assesment">NO PDF Available
+                </a>
+                {%endif%}
+            </td>
 
-            </tr>
+            <td>
+                <button class="btn btn-primary btn-sm" id="email_pdf{{clients.id}}"
+                    onclick="email_pdfs('{{clients.id}}')" class="email_pdf">Send PDF</button>
+            </td>
 
-            {% endfor %}
+        </tr>
 
-            {% else %}
-            <tr>
+        {% endfor %}
 
-                <td colspan="12" style="text-align:center;">
-                    <b>No record yet</b>
-                </td>
+        {% else %}
+        <tr>
 
-            </tr>
-            {% endif %}
+            <td colspan="12" style="text-align:center;">
+                <b>No record yet</b>
+            </td>
 
-        </tbody>
-    </table>
-    <span>Page {{ client.number }} of {{ client.paginator.num_pages }}</span>
-    <center>
-        {% if client.has_other_pages %}
-        <ul class="pagination">
-            {% if client.has_previous %}
-            <li><a href="?page={{ client.previous_page_number }}">Previous</a></li>
-            {% else %}
-            <li class="disabled"><span>&laquo;</span></li>
-            {% endif %}
-            {% for i in client.paginator.page_range %}
-            {% if client.number == i %}
-            <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
-            {% else %}
-            <li><a href="?page={{ i }}">{{ i }}</a></li>
-            {% endif %}
-            {% endfor %}
-            {% if client.has_next %}
-            <li><a href="?page={{ client.next_page_number }}">Next</a></li>
-            {% else %}
-            <li class="disabled"><span>&raquo;</span></li>
-            {% endif %}
-        </ul>
+        </tr>
         {% endif %}
 
-    </center>
+    </tbody>
+</table>
+<span>Page {{ client.number }} of {{ client.paginator.num_pages }}</span>
+<center>
+    {% if client.has_other_pages %}
+    <ul class="pagination">
+        {% if client.has_previous %}
+        <li><a href="?page={{ client.previous_page_number }}">Previous</a></li>
+        {% else %}
+        <li class="disabled"><span>&laquo;</span></li>
+        {% endif %}
+        {% for i in client.paginator.page_range %}
+        {% if client.number == i %}
+        <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+        {% else %}
+        <li><a href="?page={{ i }}">{{ i }}</a></li>
+        {% endif %}
+        {% endfor %}
+        {% if client.has_next %}
+        <li><a href="?page={{ client.next_page_number }}">Next</a></li>
+        {% else %}
+        <li class="disabled"><span>&raquo;</span></li>
+        {% endif %}
+    </ul>
+    {% endif %}
+
+</center>
 
 </div>
 <!-- Modal -->
@@ -184,42 +190,45 @@
     </div>
 </div>
 <script>
-    
+
 </script>
 <script>
-  $(function() {
-{% for clients in client %}
-{% if clients.assessment|length == 1 and status|get_item:clients.id == "Submited" %}
-$("#email_pdf" +{{clients.id}}).show()
-{%else%}
-$("#email_pdf" +{{clients.id}}).hide()
-{%endif%}
-{%endfor%} 
+    $(function () {
+        {% for clients in client %}
+        {% if clients.assessment|length == 1 and status|get_item:clients.id == "Submited" %}
+        $("#email_pdf" + {{ clients.id }}).show()
+    {%else%}
+    $("#email_pdf" + {{ clients.id }}).hide()
+    {% endif %}
+    {% endfor %} 
 });
-    
-function email_pdfs(ids){   
-    try{
-    send = document.getElementById('gender' +ids).value,ids
-    $.ajax({
-    url: 'send_mail_pdf/',
-    type : 'GET',
-    data: "assesment_id="+send+'&'+'id='+ids,
-    success: function(data){
-        alert("PDF sent sucessfully")
-    },
-    error: function(jqXHR, textStatus, errorThrown) { 
-        /* implementation goes here */ 
-    }
-});}
 
-catch{
-        $.ajax({
-            type: "GET",
-            url: "send_mail/"+document.getElementById("ass" +ids).innerHTML+'/'+ids,
-            success: function (data) {
-                alert("PDF sent sucessfully")
-            }});}
-}
+    function email_pdfs(ids) {
+        try {
+            send = document.getElementById('gender' + ids).value, ids
+            $.ajax({
+                url: 'send_mail_pdf/',
+                type: 'GET',
+                data: "assesment_id=" + send + '&' + 'id=' + ids,
+                success: function (data) {
+                    alert("PDF sent sucessfully")
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    /* implementation goes here */
+                }
+            });
+        }
+
+        catch {
+            $.ajax({
+                type: "GET",
+                url: "send_mail/" + document.getElementById("ass" + ids).innerHTML + '/' + ids,
+                success: function (data) {
+                    alert("PDF sent sucessfully")
+                }
+            });
+        }
+    }
 
 
     function client_modal(id, ob, name) {
@@ -272,15 +281,15 @@ catch{
                 }
                 else {
                     document.getElementById(obj).value = "Assesment not submit"
-                    $("#email_pdf" +obj).hide()
+                    $("#email_pdf" + obj).hide()
 
                 }
 
 
                 if (data.data[0]['Status'] == "Not Started") {
                     document.getElementById(obj).value = data.data[0]['Status']
-                    $("#email_pdf" +obj).hide()
-                    
+                    $("#email_pdf" + obj).hide()
+
 
 
                 }
@@ -289,22 +298,22 @@ catch{
                     aTag = document.getElementById("pdf" + obj)
                     aTag.href = link
                     aTag.innerHTML = "View PDF"
-                    $("#email_pdf" +obj).show()
-                    
-                  
-                    
+                    $("#email_pdf" + obj).show()
+
+
+
                 }
 
                 if (data.data[0]['Status'] == "Draft") {
-                    $("#email_pdf" +obj).hide()
-                    
+                    $("#email_pdf" + obj).hide()
+
                 }
 
                 if (data.data[0]['Status'] != "Submited") {
                     var mydiv = document.getElementById("pdf" + obj)
                     mydiv.innerHTML = "PDF not available"
                     document.getElementById("pdf" + obj).removeAttribute('href')
-                    $("#email_pdf" +obj).hide
+                    $("#email_pdf" + obj).hide
                 }
             },
         });
@@ -316,6 +325,23 @@ catch{
             type: "GET",
             data: {
                 "sort_by": sort_by,
+                'csrfmiddlewaretoken': '{{csrf_token}}'
+            },
+
+            success: function (data) {
+                $('#month-data').html(data['html']);
+
+
+            },
+        });
+    }
+    function getstatus() {
+        status = $('#getst').val();
+        console.log(status, 'status')
+        $.ajax({
+            type: "GET",
+            data: {
+                "status": status,
                 'csrfmiddlewaretoken': '{{csrf_token}}'
             },
 
@@ -343,7 +369,7 @@ catch{
             },
         });
     }
-    
+
 
 
 

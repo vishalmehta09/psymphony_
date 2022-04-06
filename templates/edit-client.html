@@ -550,11 +550,11 @@
     $(".discontinued").hide();
     {% endif %}
 
-    {% if client.theropy == "Integrated" %}
+    {% if client.theropy == "Individual" %}
     $(".selecttheropy").show();
     {% endif %}
 
-    {% if client.theropy == "Individual" %}
+    {% if client.theropy == "Integrated" %}
     $(".selecttheropy").hide();
     {% endif %}
 
@@ -564,7 +564,7 @@
 
 
     function show(value) {
-        if (value == 'Integrated') {
+        if (value == 'Individual') {
             $(".selecttheropy").show();
         }
         else {

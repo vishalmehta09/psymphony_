@@ -215,7 +215,7 @@ class ClientListing(View):
             return JsonResponse({"html": html})
         else:
             blnk_dic = {}
-            client_list = ClientTable.objects.filter(user=request.user)
+            client_list = ClientTable.objects.filter(user=request.user).order_by('slot_time_from')
             for k in client_list:
                 blnk_dic[k.id] = k.assessment
             page = request.GET.get("page", 1)
@@ -338,10 +338,35 @@ def dashboard(request):
     if request.method == "GET":
         labels = []
         data = []
+        final_list = []
         queryset = ClientTable.objects.filter(user=request.user).order_by("-assessment")
         for city in queryset:
             labels.append(city.assessment)
             data.append(city.assessment)
+            assessment_list = list(city.assessment)
+            
+            if "BT" in assessment_list:
+                obj = Assesment.objects.filter(clienttable=city.id).exclude(Status="Submited")
+                if obj:
+                    final_list.append(obj.count())
+                else:
+                    final_list.append(0)
+
+            if "OT" in assessment_list:
+                obj = OTAssesment.objects.filter(clienttable=city.id).exclude(Status="Submited")
+                if obj:
+                    final_list.append(obj.count())
+                else:
+                    final_list.append(0)
+
+            if "ST" in assessment_list:
+                obj = STAssesment.objects.filter(clienttable=city.id).exclude(Status="Submited")
+                if obj:
+                    final_list.append(obj.count())
+                else:
+                    final_list.append(0)
+
+
         passed = labels
         res = []
 
@@ -355,7 +380,7 @@ def dashboard(request):
         results = {value: len(list(freq)) for value, freq in groupby(sorted(res))}
 
         res_key = list(results.keys())
-        res_val = list(results.values())
+        res_val = final_list
         return render(request, "listing-dashboard.html", {"labels": res_key, "data": res_val})
 
 
@@ -1151,10 +1176,13 @@ def logout_user(request):
     return redirect("login")
 
 def download_pdf_file(request, id):
-
+    name = ClientTable.objects.filter(id=id)
     response = HttpResponse(content_type="application/pdf")
-    response["Content-Disposition"] = 'inline; filename="mypdf.pdf"'
-
+    for i in name:
+        filename=i.user.department + '_' + str(i.id) + '_' + i.name + '.pdf'
+    # <Department>_<Client Id>_<First Name> (Department = BT/OT/ST)
+    response["Content-Disposition"] = 'inline; filename="{}"'.format(filename)
+    print(filename, 'check filename')
     buffer = BytesIO()
     p = canvas.Canvas(buffer)
 
@@ -1168,12 +1196,12 @@ def download_pdf_file(request, id):
 
             html = HTML(string=html_string)
 
-            html.write_pdf(target="/tmp/mypdf.pdf", stylesheets=[CSS('http://psymphony.in/static/pdf/css/style.css')])
+            html.write_pdf(target="/tmp/{}".format(filename), stylesheets=[CSS('http://psymphony.in/static/pdf/css/style.css')])
             fs = FileSystemStorage("/tmp")
 
-            with fs.open("mypdf.pdf") as pdf:
+            with fs.open("{}".format(filename)) as pdf:
                 response = HttpResponse(pdf, content_type="application/pdf")
-                response["Content-Disposition"] = 'attachment; filename="mypdf.pdf"'
+                response["Content-Disposition"] = 'attachment; filename="{}"'.format(filename)
             return response
 
         if request.GET.get("assesment_id") == "OT":
@@ -1182,12 +1210,12 @@ def download_pdf_file(request, id):
             html_string = render_to_string("OT_pdf.html", {"data": assesment_data,"client_data":data})
             html = HTML(string=html_string)
 
-            html.write_pdf(target="/tmp/mypdf.pdf", stylesheets=[CSS('http://psymphony.in/static/pdf/css/style.css')])
+            html.write_pdf(target="/tmp/{}".format(filename), stylesheets=[CSS('http://psymphony.in/static/pdf/css/style.css')])
             fs = FileSystemStorage("/tmp")
 
-            with fs.open("mypdf.pdf") as pdf:
+            with fs.open("{}".format(filename)) as pdf:
                 response = HttpResponse(pdf, content_type="application/pdf")
-                response["Content-Disposition"] = 'attachment; filename="mypdf.pdf"'
+                response["Content-Disposition"] = 'attachment; filename="{}"'.format(filename)
             return response
 
         if request.GET.get("assesment_id") == "ST":
@@ -1195,18 +1223,21 @@ def download_pdf_file(request, id):
             html_string = render_to_string("ST_pdf.html", {"data": assesment_data,"client_data":data})
             html = HTML(string=html_string)
 
-            html.write_pdf(target="/tmp/mypdf.pdf", stylesheets=[CSS('http://psymphony.in/static/pdf/css/style.css')])
+            html.write_pdf(target="/tmp/{}".format(filename), stylesheets=[CSS('http://psymphony.in/static/pdf/css/style.css')])
             fs = FileSystemStorage("/tmp")
 
-            with fs.open("mypdf.pdf") as pdf:
+            with fs.open("{}".format(filename)) as pdf:
                 response = HttpResponse(pdf, content_type="application/pdf")
-                response["Content-Disposition"] = 'attachment; filename="mypdf.pdf"'
+                response["Content-Disposition"] = 'attachment; filename="{}"'.format(filename)
 
             return response
     
 def send_mail(request,assesment_id,id):
+    name = ClientTable.objects.filter(id=id)
     response = HttpResponse(content_type="application/pdf")
-    response["Content-Disposition"] = 'inline; filename="mypdf.pdf"'
+    for i in name:
+        filename=i.user.department + '_' + str(i.id) + '_' + i.name + '.pdf'
+    response["Content-Disposition"] = 'inline; filename="{}"'.format(filename)
     buffer = BytesIO()
     p = canvas.Canvas(buffer)
 
@@ -1227,7 +1258,7 @@ def send_mail(request,assesment_id,id):
             text_content = "BT Assesment"
             from_email = settings.EMAIL_HOST_USER
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
-            msg.attach("file.pdf", html.write_pdf(stylesheets=[CSS('http://psymphony.in/static/pdf/css/style.css')]), "application/pdf")
+            msg.attach("{}".format(filename), html.write_pdf(stylesheets=[CSS('http://psymphony.in/static/pdf/css/style.css')]), "application/pdf")
             msg.send()
 
 
@@ -1245,7 +1276,7 @@ def send_mail(request,assesment_id,id):
             text_content = "OT Assesment"
             from_email = settings.EMAIL_HOST_USER
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
-            msg.attach("file.pdf", html.write_pdf(stylesheets=[CSS('http://psymphony.in/static/pdf/css/style.css')]), "application/pdf")
+            msg.attach("{}".format(filename), html.write_pdf(stylesheets=[CSS('http://psymphony.in/static/pdf/css/style.css')]), "application/pdf")
             msg.send()
 
         if assesment_id == "ST":
@@ -1262,13 +1293,16 @@ def send_mail(request,assesment_id,id):
             text_content = "ST Assesment"
             from_email = settings.EMAIL_HOST_USER
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
-            msg.attach("file.pdf", html.write_pdf(stylesheets=[CSS('http://psymphony.in/static/pdf/css/style.css')]), "application/pdf")
+            msg.attach("{}".format(filename), html.write_pdf(stylesheets=[CSS('http://psymphony.in/static/pdf/css/style.css')]), "application/pdf")
             msg.send()
         return JsonResponse("Done",safe=False)
     
 def send_mail_pdf(request):
+    name = ClientTable.objects.filter(id=request.GET.get('id'))
     response = HttpResponse(content_type="application/pdf")
-    response["Content-Disposition"] = 'inline; filename="mypdf.pdf"'
+    for i in name:
+        filename=i.user.department + '_' + str(i.id) + '_' + i.name + '.pdf'
+    response["Content-Disposition"] = 'inline; filename="{}"'.format(filename)
     buffer = BytesIO()
     p = canvas.Canvas(buffer)
 
@@ -1288,7 +1322,7 @@ def send_mail_pdf(request):
             text_content = "BT Assesment"
             from_email = settings.EMAIL_HOST_USER
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
-            msg.attach("file.pdf", html.write_pdf(stylesheets=[CSS('http://psymphony.in/static/pdf/css/style.css')]), "application/pdf")
+            msg.attach("{}".format(filename), html.write_pdf(stylesheets=[CSS('http://psymphony.in/static/pdf/css/style.css')]), "application/pdf")
             msg.send()
 
 
@@ -1306,7 +1340,7 @@ def send_mail_pdf(request):
             text_content = "OT Assesment"
             from_email = settings.EMAIL_HOST_USER
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
-            msg.attach("file.pdf", html.write_pdf(stylesheets=[CSS('http://psymphony.in/static/pdf/css/style.css')]), "application/pdf")
+            msg.attach("{}".format(filename), html.write_pdf(stylesheets=[CSS('http://psymphony.in/static/pdf/css/style.css')]), "application/pdf")
             msg.send()
 
         if request.GET.get("assesment_id") == "ST":
@@ -1323,6 +1357,6 @@ def send_mail_pdf(request):
             text_content = "ST Assesment"
             from_email = settings.EMAIL_HOST_USER
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
-            msg.attach("file.pdf", html.write_pdf(stylesheets=[CSS('http://psymphony.in/static/pdf/css/style.css')]), "application/pdf")
+            msg.attach("{}".format(filename), html.write_pdf(stylesheets=[CSS('http://psymphony.in/static/pdf/css/style.css')]), "application/pdf")
             msg.send()
         return JsonResponse("Done",safe=False)

@@ -16,8 +16,7 @@
             <div class="input-bar">
                 <div class="input-search">
                     <i class="fa fa-search" aria-hidden="true"></i>
-                    <input type="text" id="myInput" placeholder="Search name, no and id"
-                        onkeyup="myFunction()">
+                    <input type="text" id="myInput" placeholder="Search name, no and id" onkeyup="myFunction()">
                 </div>
             </div>
 
@@ -76,7 +75,7 @@
                 <th>Created on</th>
                 <th>Assesments</th>
                 <th>Remarks</th>
-                <th>Action</th>
+                <th>Edit Client</th>
             </tr>
         </thead>
         <tbody>
@@ -93,7 +92,7 @@
                 <td>{{ clients.name}}</td>
                 <td>{{ clients.phone}}</td>
                 <td>{{ clients.email}}</td>
-                
+
                 <td> {% if clients.slot_time_from and clients.slot_time_to %}
                     {{ clients.slot_time_from|time:"g:iA"}}-{{clients.slot_time_to|time:"g:iA"}} {%endif%}</td>
                 <td>{{ clients.created_on}}</td>
@@ -108,7 +107,7 @@
                     {% endif %}
                     {%endfor%}
 
-                    
+
                 </td>
                 <td>
                     {{clients.remarks}}
@@ -401,7 +400,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                           
+
                             <button type="button" id="addassesment" class="btn btn-primary" onclick="modal_submit()">Add
                                 Assessment</button>
                         </div>
@@ -499,10 +498,10 @@
                 success: function (data) {
                     $("#mySelect").empty();
                     a = data.data[0]['assessment']
-                    if (a.length === 0){
-                         $("#addassesment").hide();
+                    if (a.length === 0) {
+                        $("#addassesment").hide();
                     }
-                    else{
+                    else {
                         $("#addassesment").show();
                     }
                     $.each(a, function (key, value) {
@@ -520,14 +519,14 @@
             var asses_select = document.getElementById("mySelect")
 
             var opt = document.createElement('option');
-          
+
             if (checkboxElem.checked) {
                 $("#client_select").empty();
                 $("#mySelect").empty();
                 opt.value = id
                 opt.innerHTML = name
                 client_select.add(opt)
-                if (os.length === 0){
+                if (os.length === 0) {
                     $("#addassesment").hide();
                 }
                 else {
@@ -537,7 +536,7 @@
                     $('#mySelect').append('<option value="' + value + '">' + (value == '-1' ? 'select' : value) + '</option>');
 
                 });
-                
+
 
             }
             else {
@@ -550,7 +549,8 @@
                 opt.setAttribute("selected", "selected");
                 client_select.add(opt)
                 {% for k in client %}
-                value = {{ k.id }}
+                value = {{ k.id }
+            }
             $.each('{{k.name}}'.split(','), function (key, value) {
                 $('#client_select').append('<option value="' + {{ k.id }} + '">' + (value == '-1' ? 'select' : value) + '</option>');
         });
