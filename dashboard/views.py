@@ -368,6 +368,7 @@ def dashboard(request):
 
 
         passed = labels
+        print(passed, 'passed')
         res = []
 
         for x in passed:
