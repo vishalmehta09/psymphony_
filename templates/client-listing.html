@@ -549,8 +549,7 @@
                 opt.setAttribute("selected", "selected");
                 client_select.add(opt)
                 {% for k in client %}
-                value = {{ k.id }
-            }
+                value = {{ k.id }}
             $.each('{{k.name}}'.split(','), function (key, value) {
                 $('#client_select').append('<option value="' + {{ k.id }} + '">' + (value == '-1' ? 'select' : value) + '</option>');
         });

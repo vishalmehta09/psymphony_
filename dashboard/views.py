@@ -338,37 +338,62 @@ def dashboard(request):
     if request.method == "GET":
         labels = []
         data = []
-        final_list = []
         queryset = ClientTable.objects.filter(user=request.user).order_by("-assessment")
+        print("queryset", queryset)
         for city in queryset:
-            labels.append(city.assessment)
-            data.append(city.assessment)
-            assessment_list = list(city.assessment)
-            
-            if "BT" in assessment_list:
-                obj = Assesment.objects.filter(clienttable=city.id).exclude(Status="Submited")
-                if obj:
-                    final_list.append(obj.count())
+            print(type(city.assessment), 'type')
+            print(city.assessment, 'type not')
+            if city.assessment == ['BT']:
+                if Assesment.objects.filter(clienttable__id=city.id, Status="Submited"):
+                    pass
                 else:
-                    final_list.append(0)
-
-            if "OT" in assessment_list:
-                obj = OTAssesment.objects.filter(clienttable=city.id).exclude(Status="Submited")
-                if obj:
-                    final_list.append(obj.count())
+                    labels.append(city.assessment)
+                    data.append(city.assessment)
+            if city.assessment == ['OT']:   
+                if OTAssesment.objects.filter(clienttable__id=city.id, Status="Submited"):
+                    pass
                 else:
-                    final_list.append(0)
-
-            if "ST" in assessment_list:
-                obj = STAssesment.objects.filter(clienttable=city.id).exclude(Status="Submited")
-                if obj:
-                    final_list.append(obj.count())
+                    labels.append(city.assessment)
+                    data.append(city.assessment)
+            if city.assessment == ['ST']:
+                if STAssesment.objects.filter(clienttable__id=city.id, Status="Submited"):
+                    pass
                 else:
-                    final_list.append(0)
-
-
+                    labels.append(city.assessment)
+                    data.append(city.assessment)
+            if len(city.assessment) > 1:
+                assessment = list(city.assessment)
+                print(type(assessment), 'assmentssssss list check')
+                
+                if 'BT' in assessment:
+                    if Assesment.objects.filter(clienttable__id=city.id, Status="Submited").exists():
+                        pass
+                    else:
+                        print('bt')
+                        labels.append(['BT'])
+                        data.append(['BT'])
+                if 'OT' in assessment:
+                    print('ot')
+                    if OTAssesment.objects.filter(clienttable__id=city.id, Status="Submited").exists():
+                        pass
+                    else:
+                        labels.append(['OT'])
+                        data.append(['OT'])
+                if 'ST' in assessment:
+                    print('st')
+                    if STAssesment.objects.filter(clienttable__id=city.id, Status="Submited").exists():
+                        pass
+                    else:
+                        labels.append(['ST'])
+                        data.append(['ST'])
+                    
+            else:
+                print('4')
+                pass
+                
         passed = labels
-        print(passed, 'passed')
+        print(passed, 'check passed')
+
         res = []
 
         for x in passed:
@@ -377,12 +402,17 @@ def dashboard(request):
                     res.append(b)
             else:
                 res.append(x)
-       
-        results = {value: len(list(freq)) for value, freq in groupby(sorted(res))}
 
+        results = {value: len(list(freq)) for value, freq in groupby(sorted(res))}
+        print(results, 'results')
         res_key = list(results.keys())
-        res_val = final_list
-        return render(request, "listing-dashboard.html", {"labels": res_key, "data": res_val})
+        print(res_key, 'res_key')
+        res_val = list(results.values())
+        print(res_val, 'res_val')
+
+        return render(
+            request, "listing-dashboard.html", {"labels": res_key, "data": res_val}
+        )
 
 
 class update(View):
