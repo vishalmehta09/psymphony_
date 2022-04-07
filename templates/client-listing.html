@@ -89,13 +89,13 @@
                 </td>
                 <td onclick="client_modal('{{clients.id}}')"><a href="#" data-toggle="modal"
                         data-target="#exampleModal1">{{clients.id }}</a></td>
-                <td>{{ clients.name}}</td>
+                <td>{{ clients.name}}</td>  
                 <td>{{ clients.phone}}</td>
                 <td>{{ clients.email}}</td>
 
                 <td> {% if clients.slot_time_from and clients.slot_time_to %}
                     {{ clients.slot_time_from|time:"g:iA"}}-{{clients.slot_time_to|time:"g:iA"}} {%endif%}</td>
-                <td>{{ clients.created_on}}</td>
+                <td>{{ clients.created_on|date:"d-m-Y"}}</td>
                 <td>
                     {% for assessment in blnk_dic|get_item:clients.id %}
                     {% if assessment == "ST" %}

@@ -29,7 +29,7 @@ regex = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
 
 regex2 = r'\b^[a-zA-Z ]*$\b'
 
-phone_regex = r"^(\d{10}|\d{11}|\d{12})$"
+phone_regex = r"^(\d{10})$"
 
 
 def login_user(request):
@@ -215,7 +215,7 @@ class ClientListing(View):
             return JsonResponse({"html": html})
         else:
             blnk_dic = {}
-            client_list = ClientTable.objects.filter(user=request.user).order_by('slot_time_from')
+            client_list = ClientTable.objects.filter(user=request.user).order_by('-id')
             for k in client_list:
                 blnk_dic[k.id] = k.assessment
             page = request.GET.get("page", 1)
