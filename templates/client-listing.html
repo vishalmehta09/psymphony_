@@ -1,3 +1,7 @@
+from faulthandler import disable
+from xml.dom.minidom import Document
+
+
 {% extends 'layout.html' %}
 {% load static %}
 {% block title %}Client{% endblock %}
@@ -13,6 +17,18 @@
 <div class="container">
     <div class="outer-bar" style="margin-bottom: 20px;">
         <div class="input-flied-item">
+        <div>
+            <lable>Show
+            <select name="entries" id="entries" class="drop" onchange="entry()">
+            <option value "" selected disabled>10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+                <option value="25">25</option>
+            </select>
+            entries
+            </lable>
+
+        </div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <div class="input-bar">
                 <div class="input-search">
                     <i class="fa fa-search" aria-hidden="true"></i>
@@ -34,13 +50,17 @@
                 </select>
             </div>
         </div>
-
-
         <div class="btn_flied-item">
             <div class="add-btn" style="display: flex; justify-content: right;" data-toggle="modal"
                 data-target="#exampleModal">
                 <a href="javascript:void(0)"><button type="button" class="btn btn-primary btn-sm ">Add
                         Assesment</button></a>
+            </div>
+        </div>
+        <div class="btn_flied-item">
+            <div class="add-btn" style="display: flex; justify-content: right;">
+                <a href="javascript:void(0)"><button type="button" id="getvalueid" class="btn btn-primary btn-sm " value="" onclick="edit()">Edit Client
+                    </button></a>
             </div>
         </div>
 
@@ -75,7 +95,6 @@
                 <th>Created on</th>
                 <th>Assesments</th>
                 <th>Remarks</th>
-                <th>Edit Client</th>
             </tr>
         </thead>
         <tbody>
@@ -112,10 +131,7 @@
                 <td>
                     {{clients.remarks}}
                 </td>
-                <td>
-                    <a href="update_client/{{clients.id}}"><button type="button"
-                            class="btn btn-primary btn-sm">Edit</button></a>
-                </td>
+              
 
 
             </tr>
@@ -339,6 +355,7 @@
             </div>
         </div>
     </table>
+    <div id="pageclass" >
     <span>Page {{ client.number }} of {{ client.paginator.num_pages }}</span>
     <center>
         {% if client.has_other_pages %}
@@ -364,6 +381,7 @@
         {% endif %}
 
     </center>
+    </div>
 
 
     <!-- Modal -->
@@ -401,7 +419,7 @@
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 
-                            <button type="button" id="addassesment" class="btn btn-primary" onclick="modal_submit()">Add
+                            <button type="button" id="addassesment" class="btn btn-primary"  onclick="modal_submit()">Add
                                 Assessment</button>
                         </div>
                     </div>
@@ -515,11 +533,13 @@
 
         function doalert(checkboxElem, id, os, name) {
             var checkBox = document.getElementById("accept");
-            var client_select = document.getElementById("client_select")
+            var client_select = document.getElementById("client_select");
             var asses_select = document.getElementById("mySelect")
-
             var opt = document.createElement('option');
-
+            var abc = document.getElementById("getvalueid")
+            console.log(abc, 'iss')
+            abc.value = id
+            console.log(abc, 'afterid')
             if (checkboxElem.checked) {
                 $("#client_select").empty();
                 $("#mySelect").empty();
@@ -559,7 +579,10 @@
 }
 
 
-
+        function edit(){
+            var client = document.getElementById("getvalueid").value;
+            window.location = "update_client/" + client;
+        }
         function modal_submit() {
             var client = document.getElementById("modal_form").elements.item(1).value;
             var assessment = document.getElementById("modal_form").elements.item(2).value.trim();
@@ -573,6 +596,27 @@
                 window.location = "otassesment_table/" + client;
             }
         }
+
+        function entry(){
+        entery = $('#entries').val();
+        var link = document.getElementById('pageclass');
+        console.log(link, 'link')
+        link.style.visibility = 'hidden';
+        console.log(entery, 'entries')
+        $.ajax({
+            type: "GET",
+            data: {
+                "entery": entery,
+                'csrfmiddlewaretoken': '{{csrf_token}}'
+            },
+
+            success: function (data) {
+                $('#month-data').html(data['html']);
+
+
+            },
+        });
+    }
 
         function datepicker() {
 

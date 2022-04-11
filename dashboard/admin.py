@@ -17,13 +17,13 @@ admin.site.register(Assesment, AssessmentTableAdmin)
 
 
 class STAssesmentAdmin(admin.ModelAdmin):
-    list_display = ['id','clienttable', 'therapist', 'babbling','first_word', 'main_mode_comm', 'family_history', 'motor_developments', 'oro_peripheral_mechanism', 'vegetative_skills', 'vision', 'hearing', 'response_to_name_call', 'environmental_sounds', 'eye_contact', 'attention_to_sound', 'imitation_to_body_movements', 'imitation_to_speech', 'attention_level', 'social_smile', 'initiates_interaction', 'receptive_language','expressive_language', 'provisional_diagnosis', 'recommendations', 'reels_RL_score', 'reels_EL_score', 'tests_administered', 'Status']
+    list_display = ['id','clienttable', 'therapist', 'babbling','first_word', 'main_mode_comm', 'family_history', 'motor_developments', 'oro_peripheral_mechanism', 'vegetative_skills', 'vision', 'hearing', 'response_to_name_call', 'environmental_sounds', 'eye_contact', 'attention_to_sound', 'imitation_to_body_movements', 'imitation_to_speech', 'attention_level', 'social_smile', 'initiates_interaction', 'receptive_language','expressive_language', 'provisional_diagnosis', 'recommendations', 'reels_RL_score', 'reels_EL_score', 'tests_administered', 'Status', 'email_sent']
 
 
 admin.site.register(STAssesment, STAssesmentAdmin)
 
 class OTAssesmentAdmin(admin.ModelAdmin):
-    list_display = ['id','clienttable', 'therapist', 'date_of_assessment','presenting_complaints', 'milestone_development', 'behavior_cognition', 'cognitive_skills', 'kinaesthesia', 'Status']
+    list_display = ['id','clienttable', 'therapist', 'date_of_assessment','presenting_complaints', 'milestone_development', 'behavior_cognition', 'cognitive_skills', 'kinaesthesia', 'Status', 'email_sent']
 
 
 admin.site.register(OTAssesment, OTAssesmentAdmin)

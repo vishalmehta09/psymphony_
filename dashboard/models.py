@@ -134,7 +134,6 @@ class ClientTable(models.Model):
     chief_complaints = models.TextField()
     diagnosis = models.TextField()
     remarks = models.TextField()
-
     def __str__(self):
         return self.name
 
@@ -165,7 +164,7 @@ class Assesment(models.Model):
     created_by = models.CharField(max_length=200)
     modified_on = models.DateTimeField(auto_now=False, blank=True, null=True)
     modified_by = models.CharField(max_length=200)
-    email_sent = models.CharField(max_length=10,default='')
+    email_sent =  models.BooleanField(default=False)
     version = models.CharField(max_length=10)
     Status = models.CharField(max_length=50, default='Not Started')
 
@@ -200,6 +199,7 @@ class STAssesment(models.Model):
     reels_EL_score = models.IntegerField()
     tests_administered = models.CharField(max_length=100, default='REELS')
     Status = models.CharField(max_length=50, default='Not Started')
+    email_sent =  models.BooleanField(default=False)
 
 
 class OTAssesment(models.Model):
@@ -212,3 +212,4 @@ class OTAssesment(models.Model):
     cognitive_skills = models.TextField()
     kinaesthesia = models.TextField()
     Status = models.CharField(max_length=50, default='Not Started')
+    email_sent =  models.BooleanField(default=False)

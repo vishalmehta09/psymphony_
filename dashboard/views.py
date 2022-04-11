@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from .form import *
 from django.contrib import messages
 import datetime
+import json
 from django.views import View
 from django.http import HttpResponse, JsonResponse, request, HttpResponseRedirect
 from django.template.loader import render_to_string
@@ -72,12 +73,14 @@ class ClientListing(View):
         date = request.GET.get("date", None)
         sort_by = request.GET.get("sort_by", None)
         search = request.GET.get("search", None)
+        entery = request.GET.get("entery")
+
         if request.GET.get("search") and request.GET.get("date"):
             blnk_dic = {}
             clients = ClientTable.objects.filter(
                 Q(name__icontains=request.GET.get("search"))
                 | Q(phone__icontains=request.GET.get("search"))
-                | Q(id__icontains=request.GET.get("search")),created_on=request.GET.get("date") ,user=request.user)
+                | Q(id__icontains=request.GET.get("search")),created_on=request.GET.get("date") ,user=request.user).order_by('-id')
             for k in clients:
                 blnk_dic[k.id] = k.assessment
             page = request.GET.get("page", 1)
@@ -92,7 +95,7 @@ class ClientListing(View):
             return JsonResponse({"html": html})
         if request.GET.get("date") and not request.GET.get("search"):
             blnk_dic = {}
-            clients = ClientTable.objects.filter(created_on=request.GET.get("date") ,user=request.user)
+            clients = ClientTable.objects.filter(created_on=request.GET.get("date") ,user=request.user).order_by('-id')
             for k in clients:
                 blnk_dic[k.id] = k.assessment
             page = request.GET.get("page", 1)
@@ -107,6 +110,44 @@ class ClientListing(View):
                 client = paginator.page(paginator.num_pages)
             html = render_to_string("listing-filter.html", {"client": client,"blnk_dic":blnk_dic})
             return JsonResponse({"html": html})
+        
+        if entery:
+            status = {}
+            blnk_dic = {}
+            clients = ClientTable.objects.filter(user=request.user).order_by("-id")
+            for k in clients:
+                blnk_dic[k.id] = k.assessment
+                try:
+                    status_client = Assesment.objects.get(clienttable=k.id)
+                    status[k.id] = status_client.Status
+                except Assesment.DoesNotExist:
+                    pass
+                try:
+                    status_client = STAssesment.objects.get(clienttable=k.id)
+                    status[k.id] = status_client.Status
+                except STAssesment.DoesNotExist:
+                    pass
+                try:
+                    status_client = OTAssesment.objects.get(clienttable=k.id)
+                    status[k.id] = status_client.Status
+                except OTAssesment.DoesNotExist:
+                    pass
+            page = request.GET.get("page", 1)
+
+            paginator = Paginator(clients, entery)
+            print(paginator, 'paginator')
+            try:
+                client = paginator.page(page)
+                print(client, 'pagination')
+            except PageNotAnInteger:
+                client = paginator.page(1)
+                print(client, 'pagenotinteger')
+            except EmptyPage:
+                client = paginator.page(paginator.num_pages)
+                print(client, 'emptypage')
+            html = render_to_string("listing-filter.html", {"client": client,"blnk_dic":blnk_dic})
+            return JsonResponse({"html": html})
+
         if sort_by == "dsc":
             status = {}
             blnk_dic = {}
@@ -133,6 +174,7 @@ class ClientListing(View):
             paginator = Paginator(clients, 10)
             try:
                 client = paginator.page(page)
+                print(client,'chekk')
             except PageNotAnInteger:
                 client = paginator.page(1)
             except EmptyPage:
@@ -178,7 +220,7 @@ class ClientListing(View):
                 Q(name__icontains=request.GET.get("search"))
                 | Q(phone__icontains=request.GET.get("search"))
                 | Q(id__icontains=request.GET.get("search")),user=request.user
-            )
+            ).order_by('-id')
             for k in clients:
                 blnk_dic[k.id] = k.assessment
 
@@ -198,7 +240,7 @@ class ClientListing(View):
 
         elif search == "":
             blnk_dic = {}
-            clients = ClientTable.objects.filter(user=request.user)
+            clients = ClientTable.objects.filter(user=request.user).order_by('-id')
             for k in clients:
                 blnk_dic[k.id] = k.assessment
             page = request.GET.get("page", 1)
@@ -326,7 +368,7 @@ class Client(View):
                 diagnosis=re.sub(" +", " ", diagnosis),
                 remarks=re.sub(" +", " ", remarks),
                 created_on=created_on,
-                created_by=request.user.username,
+                created_by=request.user.username
             )
             messages.success(request, "Form created successful")
             return redirect("dashboard")
@@ -344,19 +386,19 @@ def dashboard(request):
             print(type(city.assessment), 'type')
             print(city.assessment, 'type not')
             if city.assessment == ['BT']:
-                if Assesment.objects.filter(clienttable__id=city.id, Status="Submited"):
+                if Assesment.objects.filter(clienttable__id=city.id, Status="Submited", email_sent=True):
                     pass
                 else:
                     labels.append(city.assessment)
                     data.append(city.assessment)
             if city.assessment == ['OT']:   
-                if OTAssesment.objects.filter(clienttable__id=city.id, Status="Submited"):
+                if OTAssesment.objects.filter(clienttable__id=city.id, Status="Submited", email_sent=True):
                     pass
                 else:
                     labels.append(city.assessment)
                     data.append(city.assessment)
             if city.assessment == ['ST']:
-                if STAssesment.objects.filter(clienttable__id=city.id, Status="Submited"):
+                if STAssesment.objects.filter(clienttable__id=city.id, Status="Submited", email_sent=True):
                     pass
                 else:
                     labels.append(city.assessment)
@@ -366,7 +408,7 @@ def dashboard(request):
                 print(type(assessment), 'assmentssssss list check')
                 
                 if 'BT' in assessment:
-                    if Assesment.objects.filter(clienttable__id=city.id, Status="Submited").exists():
+                    if Assesment.objects.filter(clienttable__id=city.id, Status="Submited", email_sent=True).exists():
                         pass
                     else:
                         print('bt')
@@ -374,14 +416,14 @@ def dashboard(request):
                         data.append(['BT'])
                 if 'OT' in assessment:
                     print('ot')
-                    if OTAssesment.objects.filter(clienttable__id=city.id, Status="Submited").exists():
+                    if OTAssesment.objects.filter(clienttable__id=city.id, Status="Submited", email_sent=True).exists():
                         pass
                     else:
                         labels.append(['OT'])
                         data.append(['OT'])
                 if 'ST' in assessment:
                     print('st')
-                    if STAssesment.objects.filter(clienttable__id=city.id, Status="Submited").exists():
+                    if STAssesment.objects.filter(clienttable__id=city.id, Status="Submited", email_sent=True).exists():
                         pass
                     else:
                         labels.append(['ST'])
@@ -618,6 +660,7 @@ class assesment(View):
         return render(request, "assesment.html", {"client": client})
 
     def post(self, request, id):
+        print(request.POST.get("email_sent"), 'emailsent')
         if request.POST.get('email_sent') == "on":
             template_data = {'client_name': request.POST.get("name"), 'client_address': request.POST.get("address"),
                                 'assignment_name': ['BT'],
@@ -635,7 +678,10 @@ class assesment(View):
         behavioural_observation = request.POST.get("behavioural_observation")
         impression = request.POST.get("impression")
         recommendations = request.POST.get("recommendations")
-        email_sent = request.POST.get("email_sent","")
+        if request.POST.get("email_sent") == 'on':
+            email_sent = True
+        else:
+            email_sent = False
         if request.POST.get("draft"):
             Status = "Draft"
         else:
@@ -702,6 +748,10 @@ class STassesmentTable(View):
         reels_RL_score = request.POST.get("reels_RL_score")
         reels_EL_score = request.POST.get("reels_EL_score")
         tests_administered = request.POST.get("tests_administered")
+        if request.POST.get("email_sent") == 'on':
+            email_sent = True
+        else:
+            email_sent = False
         if request.POST.get("draft"):
             Status = "Draft"
         else:
@@ -736,6 +786,7 @@ class STassesmentTable(View):
             therapist=request.user.username,
             clienttable_id=id,
             Status=Status,
+            email_sent=email_sent
         )
         messages.success(request, "Form created successful")
         return redirect("assesment_listing")
@@ -757,6 +808,10 @@ class OTAssesmentTable(View):
         behavior_cognition = request.POST.get("behavior_cognition")
         cognitive_skills = request.POST.get("cognitive_skills")
         kinaesthesia = request.POST.get("kinaesthesia")
+        if request.POST.get("email_sent") == 'on':
+            email_sent = True
+        else:
+            email_sent = False
         if request.POST.get("draft"):
             Status = "Draft"
         else:
@@ -771,6 +826,7 @@ class OTAssesmentTable(View):
             therapist=request.user.username,
             clienttable_id=id,
             Status=Status,
+            email_sent=email_sent
         )
         messages.success(request, "Form created successful")
         return redirect("assesment_listing")
@@ -800,7 +856,47 @@ class AssessmentListing(View):
 
         sort_by = request.GET.get("sort_by")
         search = request.GET.get("search")
+        entery = request.GET.get("entery")
+        print(entery, 'enteryentery')
         status = {}
+        if entery:
+            status = {}
+            blnk_dic = {}
+            clients = ClientTable.objects.filter(user=request.user).order_by('-id')
+            for s in clients:
+                blnk_dic[s.id]=s.assessment
+            for a in clients:
+                try:
+                    status_client = Assesment.objects.get(clienttable=a.id)
+                    status[a.id] = status_client.Status
+
+                except Assesment.DoesNotExist as e:
+                    status[a.id] = "None"
+
+                try:
+                    status_client = STAssesment.objects.get(clienttable=a.id)
+                    status[a.id] = status_client.Status
+                except STAssesment.DoesNotExist as e:
+                    status[a.id] = "None"
+
+                try:
+                    status_client = OTAssesment.objects.get(clienttable=a.id)
+                    status[a.id] = status_client.Status
+                except OTAssesment.DoesNotExist as e:
+                    status[a.id] = "None"
+            page = request.GET.get("page", 1)
+
+            paginator = Paginator(clients, entery)
+            try:
+                client = paginator.page(page)
+            except PageNotAnInteger:
+                client = paginator.page(1)
+            except EmptyPage:
+                client = paginator.page(paginator.num_pages)
+            html = render_to_string(
+                "listing-assessment-filter.html", {"client": client,'blnk_dic':blnk_dic,'status':status}
+            )
+            return JsonResponse({"html": html})
         if sort_by == "dsc":
             status = {}
             blnk_dic = {}
@@ -885,7 +981,7 @@ class AssessmentListing(View):
                 Q(assessment__icontains=request.GET.get("search"))
                 | Q(name__icontains=request.GET.get("search"))
                 | Q(id__icontains=request.GET.get("search")),user=request.user
-            )
+            ).order_by('-id')
             for s in clients:
                 blnk_dic[s.id] = s.assessment
 
@@ -959,7 +1055,7 @@ class AssessmentListing(View):
         elif search == "":
             status = {}
             blnk_dic={}
-            clients = ClientTable.objects.filter(user=request.user)
+            clients = ClientTable.objects.filter(user=request.user).order_by('-id')
             for a in clients:
                 blnk_dic[a.id]=a.assessment
                 try:
@@ -1004,7 +1100,7 @@ class AssessmentListing(View):
             return JsonResponse({"html": html})
         else:
             blnk_dic ={}
-            client_ass = ClientTable.objects.filter(user=request.user)
+            client_ass = ClientTable.objects.filter(user=request.user).order_by('-id')
             for k in client_ass:
                 blnk_dic[k.id]=k.assessment
             for a in client_ass:
@@ -1065,6 +1161,10 @@ class UpdateBtAssessment(View):
 
     def post(self, request, id):
         client = Assesment.objects.get(clienttable__id=id)
+        if request.POST.get("email_sent") == 'on':
+            email_sent = True
+        else:
+            email_sent = False
         client.date_of_assessment= request.POST.get('date_of_assessment')
         client.prenatal_history = re.sub(
             " +", " ", request.POST.get("prenatal_history")
@@ -1081,7 +1181,7 @@ class UpdateBtAssessment(View):
         )
         client.impression = re.sub(" +", " ", request.POST.get("impression"))
         client.recommendations = re.sub(" +", " ", request.POST.get("recommendations"))
-        client.email_sent = request.POST.get("email_sent","")
+        client.email_sent = email_sent
         if request.POST.get("draft"):
             client.Status = "Draft"
         else:
@@ -1105,6 +1205,10 @@ class UpdateStAssessment(View):
 
     def post(self, request, id):
         client = STAssesment.objects.get(clienttable__id=id)
+        if request.POST.get("email_sent") == 'on':
+            email_sent = True
+        else:
+            email_sent = False
         client.babbling = re.sub(" +", " ", request.POST.get("babbling"))
         client.first_word = re.sub(" +", " ", request.POST.get("first_word"))
         client.main_mode_comm = re.sub(" +", " ", request.POST.get("main_mode_comm"))
@@ -1156,6 +1260,7 @@ class UpdateStAssessment(View):
         client.tests_administered = re.sub(
             " +", " ", request.POST.get("tests_administered")
         )
+        client.email_sent=email_sent
         client.modified_on = datetime.datetime.now()
         client.modified_by = request.user.username
         if request.POST.get("draft"):
@@ -1178,6 +1283,10 @@ class UpdateOtAssessment(View):
 
     def post(self, request, id):
         client = OTAssesment.objects.filter(clienttable__id=id).get()
+        if request.POST.get("email_sent") == 'on':
+            email_sent = True
+        else:
+            email_sent = False
         client.date_of_assessment = request.POST.get("date_of_assessment")
         client.presenting_complaints = re.sub(
             " +", " ", request.POST.get("presenting_complaints")
@@ -1194,6 +1303,7 @@ class UpdateOtAssessment(View):
         client.kinaesthesia = re.sub(" +", " ", request.POST.get("kinaesthesia"))
         client.modified_on = datetime.datetime.now()
         client.modified_by = request.user.username
+        client.email_sent=email_sent
         if request.POST.get("draft"):
             client.Status = "Draft"
         else:
@@ -1277,6 +1387,7 @@ def send_mail(request,assesment_id,id):
     for k in data:
         if assesment_id == "BT":
             assesment_data = Assesment.objects.filter(clienttable=k.id)
+            
             html_string = render_to_string(
                 "BT_pdf.html", {"data": assesment_data, "client_data": data}
             )
@@ -1291,10 +1402,15 @@ def send_mail(request,assesment_id,id):
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
             msg.attach("{}".format(filename), html.write_pdf(stylesheets=[CSS('http://psymphony.in/static/pdf/css/style.css')]), "application/pdf")
             msg.send()
+            saveemail = Assesment.objects.get(clienttable=k.id)
+            saveemail.email_sent=True
+            saveemail.save()
+            
 
 
         if assesment_id == "OT":
             assesment_data = OTAssesment.objects.filter(clienttable=k.id)
+            
             html_string = render_to_string(
                 "OT_pdf.html", {"data": assesment_data, "client_data": data}
             )
@@ -1309,6 +1425,9 @@ def send_mail(request,assesment_id,id):
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
             msg.attach("{}".format(filename), html.write_pdf(stylesheets=[CSS('http://psymphony.in/static/pdf/css/style.css')]), "application/pdf")
             msg.send()
+            saveemail = OTAssesment.objects.get(clienttable=k.id)
+            saveemail.email_sent=True
+            saveemail.save()
 
         if assesment_id == "ST":
             assesment_data = STAssesment.objects.filter(clienttable=k.id)
@@ -1326,6 +1445,9 @@ def send_mail(request,assesment_id,id):
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
             msg.attach("{}".format(filename), html.write_pdf(stylesheets=[CSS('http://psymphony.in/static/pdf/css/style.css')]), "application/pdf")
             msg.send()
+            saveemail = STAssesment.objects.get(clienttable=k.id)
+            saveemail.email_sent=True
+            saveemail.save()
         return JsonResponse("Done",safe=False)
     
 def send_mail_pdf(request):
@@ -1355,6 +1477,9 @@ def send_mail_pdf(request):
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
             msg.attach("{}".format(filename), html.write_pdf(stylesheets=[CSS('http://psymphony.in/static/pdf/css/style.css')]), "application/pdf")
             msg.send()
+            saveemail = Assesment.objects.get(clienttable=k.id)
+            saveemail.email_sent=True
+            saveemail.save()
 
 
         if request.GET.get("assesment_id") == "OT":
@@ -1373,6 +1498,9 @@ def send_mail_pdf(request):
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
             msg.attach("{}".format(filename), html.write_pdf(stylesheets=[CSS('http://psymphony.in/static/pdf/css/style.css')]), "application/pdf")
             msg.send()
+            saveemail = OTAssesment.objects.get(clienttable=k.id)
+            saveemail.email_sent=True
+            saveemail.save()
 
         if request.GET.get("assesment_id") == "ST":
             assesment_data = STAssesment.objects.filter(clienttable=k.id)
@@ -1390,4 +1518,7 @@ def send_mail_pdf(request):
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
             msg.attach("{}".format(filename), html.write_pdf(stylesheets=[CSS('http://psymphony.in/static/pdf/css/style.css')]), "application/pdf")
             msg.send()
+            saveemail = Assesment.objects.get(clienttable=k.id)
+            saveemail.email_sent=True
+            saveemail.save()
         return JsonResponse("Done",safe=False)

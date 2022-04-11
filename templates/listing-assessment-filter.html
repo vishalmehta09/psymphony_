@@ -89,3 +89,29 @@
 
     </tbody>
 </table>
+
+<span>Page {{ client.number }} of {{ client.paginator.num_pages }}</span>
+<center>
+    {% if client.has_other_pages %}
+    <ul class="pagination">
+        {% if client.has_previous %}
+        <li><a href="?page={{ client.previous_page_number }}">Previous</a></li>
+        {% else %}
+        <li class="disabled"><span>&laquo;</span></li>
+        {% endif %}
+        {% for i in client.paginator.page_range %}
+        {% if client.number == i %}
+        <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+        {% else %}
+        <li><a href="?page={{ i }}">{{ i }}</a></li>
+        {% endif %}
+        {% endfor %}
+        {% if client.has_next %}
+        <li><a href="?page={{ client.next_page_number }}">Next</a></li>
+        {% else %}
+        <li class="disabled"><span>&raquo;</span></li>
+        {% endif %}
+    </ul>
+    {% endif %}
+
+</center>

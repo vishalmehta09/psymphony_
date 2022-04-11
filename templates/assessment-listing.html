@@ -10,6 +10,19 @@
     {% endfor %}
     {% endif %}
     <div class="input-bar1">
+         <div>
+            <lable>Show
+            <select name="entries" id="entries" class="drop" onchange="entry()">
+            <option value "" selected disabled>10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+                <option value="25">25</option>
+            </select>
+            entries
+            </lable>
+
+        </div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
         <div class="input-search">
             <i class="fa fa-search" aria-hidden="true"></i>
             <input type="text" id="myInput" placeholder="Search name,id,assessment" onkeyup="myFunction()">
@@ -22,9 +35,9 @@
                 <option value="dsc">Oldest</option>
             </select>
         </div> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-   
 
-     </div>
+
+    </div>
 </div>
 <table class="table table-bordered month-data" id="month-data">
 
@@ -120,6 +133,7 @@
 
     </tbody>
 </table>
+<div id="pageclass">
 <span>Page {{ client.number }} of {{ client.paginator.num_pages }}</span>
 <center>
     {% if client.has_other_pages %}
@@ -145,8 +159,8 @@
     {% endif %}
 
 </center>
-
 </div>
+
 <!-- Modal -->
 <div class="modal fade" style="margin-top: 19px;" id="exampleModal1" tabindex="-1" role="dialog"
     aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -321,6 +335,7 @@
 
     function sort() {
         sort_by = $('#sortby').val();
+        
         $.ajax({
             type: "GET",
             data: {
@@ -335,6 +350,28 @@
             },
         });
     }
+
+    function entry(){
+        entery = $('#entries').val();
+        var link = document.getElementById('pageclass');
+        console.log(link, 'link')
+        link.style.visibility = 'hidden';
+        console.log(entery, 'entries')
+        $.ajax({
+            type: "GET",
+            data: {
+                "entery": entery,
+                'csrfmiddlewaretoken': '{{csrf_token}}'
+            },
+
+            success: function (data) {
+                $('#month-data').html(data['html']);
+
+
+            },
+        });
+    }
+
     function getstatus() {
         status = $('#getst').val();
         console.log(status, 'status')
